@@ -1,70 +1,15 @@
-# Getting Started with Create React App
+MangaQu - Read Manga Online Free
+Are you looking for a platform to read manga online? Look no further than our website! With over 10,000 titles, we offer an extensive collection of manga comics for all readers. Our platform provides a user-friendly interface that is easy to navigate and explore, so you can quickly find your desired title.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+We have a vast range of genres and sub-genres, ensuring there is something for everyone. From romance to action, we have got it all covered. We are always updating our platform with new and exciting manga titles, and all our comics are high-quality. You'll never be disappointed with the quality of the images.
 
-## Available Scripts
+Safe to use
+We understand how annoying it is to deal with pop-up ads and unwanted distractions while reading, which is why we have zero pop-up ads. Our platform is completely safe to use, and your reading experience will not be disrupted by unwanted advertisements.
 
-In the project directory, you can run:
+Smart features
+We also offer a smart and convenient sync feature that allows you to access your content on both your PC and mobile devices. No matter where you are, you can pick up where you left off, making reading manga comics even more enjoyable.
 
-### `npm start`
+Completely free
+Our website is entirely free to use. You don't need to register or pay for anything to access our vast collection of manga comics. We also provide you with the flexibility to switch between dark and light themes for comfortable reading.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Browse All Manga
