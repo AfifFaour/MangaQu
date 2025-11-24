@@ -20,11 +20,11 @@ Our website is entirely free to use. You don't need to register or pay for anyth
 
 Technologies
 
-Frontend
-•	React.js 18 : Component-based UI library.
-•	React Router DOM : Client-side routing.
-•	Lucide React : Icon library.
-•	Material-UI Icons : Additional icons.
+Frontend 
+•	React.js 18 : Component-based UI library. 
+•	React Router DOM : Client-side routing. 
+•	Lucide React : Icon library. 
+•	Material-UI Icons : Additional icons. 
 •	CSS3 : Styling and responsive design. 
 
 Codees:
@@ -41,8 +41,6 @@ Codees:
 3-MangaCard
 
 <img width="655" height="945" alt="Annotation 2025-11-23 101930" src="https://github.com/user-attachments/assets/cf03411e-d733-4a81-92ea-c5c363dec420" />
-
 <img width="1264" height="911" alt="Annotation 2025-11-23 102111" src="https://github.com/user-attachments/assets/59bbc10f-f385-4d0a-b128-d82b31578593" />
-<img width="1264" height="911" alt="Annotation 2025-11-23 102111" src="https://github.com/user-attachments/assets/c1c439d7-6c2a-4ef4-bae7-0d21712aad4d" />
 <img width="644" height="913" alt="Annotation 2025-11-23 102230" src="https://github.com/user-attachments/assets/258688f5-88bf-4360-b5fe-3d32149aff85" />
 
