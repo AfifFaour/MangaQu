@@ -21,10 +21,8 @@ const MangaDetail = () => {
   const { mangaList, addBookmark, removeBookmark, bookmarks } = useManga();
   const [activeTab, setActiveTab] = useState('chapters');
   
-  // Find manga by ID
   const manga = mangaList.find(m => m.id === parseInt(id));
 
-  // Sample chapters data since we don't have backend
   const sampleChapters = [
     { id: 1, number: 1, title: "The Beginning", date: "2024-01-20", views: 15000 },
     { id: 2, number: 2, title: "The Journey Starts", date: "2024-01-18", views: 12000 },
@@ -33,7 +31,6 @@ const MangaDetail = () => {
     { id: 5, number: 5, title: "Revelation", date: "2024-01-10", views: 8800 },
   ];
 
-  // Sample related manga
   const relatedManga = mangaList.filter(m => m.id !== parseInt(id)).slice(0, 6);
 
   if (!manga) {
@@ -71,7 +68,6 @@ const MangaDetail = () => {
         console.log('Error sharing:', err);
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     }
@@ -97,7 +93,6 @@ const MangaDetail = () => {
 
   return (
     <div className="manga-detail">
-      {/* Back Button */}
       <div className="back-nav">
         <Link to="/browse" className="back-button">
           <ArrowLeft size={20} />
@@ -105,7 +100,6 @@ const MangaDetail = () => {
         </Link>
       </div>
 
-      {/* Manga Header */}
       <div className="manga-header">
         <div className="manga-cover">
           <img src={manga.image || '/placeholder-manga.jpg'} alt={manga.title} className="cover-image" />
@@ -200,7 +194,6 @@ const MangaDetail = () => {
         </div>
       </div>
 
-      {/* Content Tabs */}
       <div className="content-tabs">
         <div className="tab-nav">
           <button 
