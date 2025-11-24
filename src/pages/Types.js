@@ -24,8 +24,7 @@ const Types = () => {
       let filteredMangas = selectedType === 'all' 
         ? mangaData 
         : getMangaByType(selectedType);
-      
-      // Sort the mangas
+  
       if (sortBy === 'newest') {
         filteredMangas.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
       } else if (sortBy === 'popular') {
