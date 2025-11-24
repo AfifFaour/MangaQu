@@ -23,10 +23,8 @@ const LoginPage = () => {
     setLoading(true);
     setError('');
 
-    // Simulate API call
     try {
       console.log('Login attempt:', formData);
-      // Add your authentication logic here
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (err) {
       setError('Login failed. Please check your credentials.');
