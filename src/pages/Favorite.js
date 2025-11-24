@@ -9,18 +9,15 @@ const Favorite = () => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-  // Mock favorite manga IDs - in a real app, this would come from user data
-  const favoriteMangaIds = [1, 2, 3, 6]; // One Piece, Solo Leveling, Jujutsu Kaisen
+  const favoriteMangaIds = [1, 2, 3, 6]; 
 
   useEffect(() => {
     setTimeout(() => {
       if (isLoggedIn) {
-        // Filter mangaData to only include favorited manga
         const favoriteMangas = mangaData.filter(manga => 
           favoriteMangaIds.includes(manga.id)
         ).map(manga => ({
           ...manga,
-          // Add favorited date (in real app, this would come from backend)
           favoritedDate: getFavoritedDate(manga.id)
         }));
         
@@ -30,7 +27,6 @@ const Favorite = () => {
     }, 800);
   }, [isLoggedIn]);
 
-  // Helper function to generate mock favorited dates
   const getFavoritedDate = (mangaId) => {
     const dates = {
       1: '2024-01-15',
