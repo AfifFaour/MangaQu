@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MangaCard from '../common/MangaCard';
+import MangaCard from '../Components/common/MangaCard';
 import { Grid, List, Filter, ChevronDown, Search, X } from 'lucide-react';
 import '../../styles/MangaGrid.css';
 
