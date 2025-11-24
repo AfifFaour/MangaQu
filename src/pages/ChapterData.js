@@ -1,6 +1,3 @@
-
-// data/ChapterData.js
-
 export const chapterData = {
   // One Piece Chapters
   1: [
@@ -9,7 +6,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "The Pirate Hunter, Zoro", date: "1997-08-05", views: 2100000 },
     { id: 4, number: 4, title: "The Marine Captain, Morgan", date: "1997-08-12", views: 2000000 },
     { id: 5, number: 5, title: "The King of the Pirates and the Master Swordsman", date: "1997-08-19", views: 1950000 },
-    // ... continuing up to chapter 1100
     { id: 1100, number: 1100, title: "The Final Battle Begins", date: "2024-01-10", views: 1800000 }
   ],
 
@@ -185,7 +181,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "Sabito and Makomo", date: "2016-02-29", views: 1850000 },
     { id: 4, number: 4, title: "A Mountain of Hands", date: "2016-03-07", views: 1800000 },
     { id: 5, number: 5, title: "My Own Steel", date: "2016-03-14", views: 1750000 },
-    // ... continuing up to chapter 205
     { id: 205, number: 205, title: "Life Shining Across the Years", date: "2020-05-18", views: 1500000 }
   ],
 
@@ -196,7 +191,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "Girl of Steel", date: "2018-03-19", views: 1650000 },
     { id: 4, number: 4, title: "Curse User", date: "2018-03-26", views: 1600000 },
     { id: 5, number: 5, title: "Cursed Child", date: "2018-04-02", views: 1550000 },
-    // ... continuing up to chapter 245
     { id: 245, number: 245, title: "The Culling Game", date: "2024-01-24", views: 1300000 }
   ],
 
@@ -207,7 +201,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "The Date", date: "2018-12-17", views: 1550000 },
     { id: 4, number: 4, title: "Power", date: "2018-12-24", views: 1500000 },
     { id: 5, number: 5, title: "Preparation to Kill", date: "2018-12-31", views: 1450000 },
-    // ... continuing up to chapter 127
     { id: 127, number: 127, title: "The Apocalypse", date: "2024-01-21", views: 1200000 }
   ],
 
@@ -218,7 +211,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "Comeback", date: "2017-03-15", views: 1450000 },
     { id: 4, number: 4, title: "Reunion", date: "2017-03-22", views: 1400000 },
     { id: 5, number: 5, title: "Declaration of War", date: "2017-03-29", views: 1350000 },
-    // ... continuing up to chapter 278
     { id: 278, number: 278, title: "The Final Timeline", date: "2022-11-16", views: 1100000 }
   ],
 
@@ -229,7 +221,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "The Ancient City", date: "2024-01-15", views: 130000 },
     { id: 4, number: 4, title: "New Companions", date: "2024-01-22", views: 120000 },
     { id: 5, number: 5, title: "The Final Boss", date: "2024-01-29", views: 110000 },
-    // ... continuing up to chapter 15
     { id: 15, number: 15, title: "The New World", date: "2024-01-25", views: 100000 }
   ],
 
@@ -240,7 +231,6 @@ export const chapterData = {
     { id: 3, number: 3, title: "The Orc Disaster", date: "2024-01-15", views: 240000 },
     { id: 4, number: 4, title: "Rimuru's Evolution", date: "2024-01-22", views: 220000 },
     { id: 5, number: 5, title: "The Jura Forest Alliance", date: "2024-01-29", views: 200000 },
-    // ... continuing up to chapter 8
     { id: 8, number: 8, title: "The Demon Lord Awakens", date: "2024-01-24", views: 180000 }
   ],
 
