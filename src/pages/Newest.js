@@ -1,4 +1,3 @@
-// pages/Newest.js
 import React, { useState, useEffect } from 'react';
 import MangaGrid from '../Components/manga/MangaGrid';
 import { getNewestManga } from '../pages/mangaData';
