@@ -5,7 +5,6 @@ import '../styles/Home.css';
 const Home = () => {
   return (
     <div className="home">
-      {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">Read Manga Online For Free</h1>
@@ -15,8 +14,7 @@ const Home = () => {
           </Link>
         </div>
       </section>
-
-      {/* Features Section */}
+      
       <section className="features-section">
         <div className="container">
           <div className="features-content">
