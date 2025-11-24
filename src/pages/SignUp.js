@@ -47,10 +47,9 @@ const SignUp = () => {
       return;
     }
 
-    // Simulate API call
+
     try {
       console.log('Signup attempt:', formData);
-      // Add your registration logic here
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (err) {
       setError('Registration failed. Please try again.');
