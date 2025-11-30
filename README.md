@@ -27,20 +27,9 @@ Frontend
 •	Material-UI Icons : Additional icons. 
 •	CSS3 : Styling and responsive design. 
 
-Codees:
-
-1-Browse
-
-<img width="568" height="575" alt="Annotation 2025-11-23 101406" src="https://github.com/user-attachments/assets/7865b8eb-7c3d-436a-8052-964dbf4cca9b" />
-
-2-Newest
-
-<img width="767" height="935" alt="Annotation 2025-11-23 101702" src="https://github.com/user-attachments/assets/7bffed06-60f0-459b-a75a-cdca009b8453" />
-<img width="826" height="197" alt="Annotation 2025-11-23 101757" src="https://github.com/user-attachments/assets/a12727f8-fdb7-41fe-86f2-b01e38b1576e" />
-
-3-MangaCard
-
-<img width="655" height="945" alt="Annotation 2025-11-23 101930" src="https://github.com/user-attachments/assets/cf03411e-d733-4a81-92ea-c5c363dec420" />
-<img width="1264" height="911" alt="Annotation 2025-11-23 102111" src="https://github.com/user-attachments/assets/59bbc10f-f385-4d0a-b128-d82b31578593" />
-<img width="644" height="913" alt="Annotation 2025-11-23 102230" src="https://github.com/user-attachments/assets/258688f5-88bf-4360-b5fe-3d32149aff85" />
-
+MangaQu---UI
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1899" height="917" alt="Screenshot 2025-11-30 155845" src="https://github.com/user-attachments/assets/d4e5c280-8aae-4795-aba5-ede8eccff34f" />
+<img width="1900" height="913" alt="Screenshot 2025-11-30 155902" src="https://github.com/user-attachments/assets/bc78983f-8391-4550-b92a-79b3a620fff4" />
+<img width="1904" height="916" alt="Screenshot 2025-11-30 155925" src="https://github.com/user-attachments/assets/390eec2e-d8d9-49fb-ba32-3230b0731789" />
+<img width="1904" height="895" alt="Screenshot 2025-11-30 155941" src="https://github.com/user-attachments/assets/3a348073-87d5-4fb0-93ca-ae749b373cb7" />
