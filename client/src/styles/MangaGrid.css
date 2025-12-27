@@ -1,0 +1,471 @@
+.manga-grid-container {
+  padding: 1rem 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.manga-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-title {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.manga-count {
+  color: #888;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Search */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 20px;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  color: white;
+  font-size: 0.9rem;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #666;
+  background: #333;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #888;
+}
+
+.clear-search {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.clear-search:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.view-btn {
+  background: none;
+  border: none;
+  color: #888;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.view-btn:hover {
+  color: white;
+}
+
+/* Sort Dropdown */
+.sort-dropdown {
+  position: relative;
+}
+
+.sort-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  min-width: 150px;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.dropdown-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  pointer-events: none;
+}
+
+/* Filter Toggle */
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.filter-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #666;
+  color: white;
+}
+
+.filter-toggle.active {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.filter-toggle.has-filters {
+  border-color: #10b981;
+}
+
+.filter-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+/* Filter Panel */
+.filter-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #333;
+  border-radius: 12px;
+  margin-bottom: 1.5rem; 
+  padding: 1rem;
+}
+
+.filter-section {
+  margin-bottom: 1rem;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section h4 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.genre-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-filter {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.genre-filter:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.genre-filter.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.status-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-filter {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.status-filter:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.status-filter.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.clear-filters {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.clear-filters:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* ==================== */
+/* GRID & LIST VIEW */
+/* ==================== */
+
+/* Manga Grid Layout */
+.manga-grid {
+  display: grid;
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+/* Grid View - Exactly 4 per row */
+.manga-grid.grid {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.manga-grid.grid .manga-card {
+  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.manga-grid.grid .manga-card:hover {
+  transform: translateY(-4px);
+}
+
+/* List View - 2 columns per row */
+.manga-grid.list {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 1.5rem;
+}
+
+.manga-grid.list .manga-card {
+  width: 100%;
+  margin: 0;
+  height: auto;
+}
+
+/* Loading States */
+.manga-card.loading {
+  pointer-events: none;
+}
+
+.image-skeleton {
+  width: 100%;
+  height: 100%;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+
+.title-skeleton {
+  height: 1.25rem;
+  background: #2a2a2a;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.description-skeleton {
+  height: 2.5rem;
+  background: #2a2a2a;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.meta-skeleton {
+  height: 1rem;
+  background: #2a2a2a;
+  border-radius: 4px;
+  width: 80%;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #888;
+}
+
+.no-results h3 {
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.clear-filters-btn {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .manga-grid.grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .manga-grid.list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .manga-grid.grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .manga-grid.list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .manga-grid-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .header-controls {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .search-input {
+    width: 200px;
+  }
+
+  .manga-grid.grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .manga-grid.list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .manga-grid-container {
+    padding: 1rem 0;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .manga-grid.grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .manga-grid.list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .genre-filters,
+  .status-filters {
+    justify-content: center;
+  }
+}

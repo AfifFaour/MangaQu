@@ -1,0 +1,311 @@
+/* src/pages/Reading.css */
+.reading-container {
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.reader-header {
+  background: #2d2d2d;
+  padding: 15px 20px;
+  border-bottom: 2px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.reader-info h1 {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #f0f0f0;
+}
+
+.reader-info h2 {
+  font-size: 1rem;
+  margin: 5px 0;
+  color: #ccc;
+}
+
+.reader-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.reader-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.chapter-select {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 8px 15px;
+  border-radius: 4px;
+  min-width: 200px;
+}
+
+.back-btn {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.back-btn:hover {
+  background: #555;
+}
+
+.reader-nav {
+  background: #2d2d2d;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.nav-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+  min-width: 120px;
+}
+
+.nav-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.nav-btn:not(:disabled):hover {
+  background: #45a049;
+}
+
+.page-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ccc;
+}
+
+.page-input {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  width: 60px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.reader-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: auto;
+}
+
+.page-container {
+  max-width: 100%;
+  text-align: center;
+}
+
+.reader-page {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border-radius: 4px;
+}
+
+.page-number {
+  margin-top: 10px;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.reader-footer {
+  background: #2d2d2d;
+  padding: 15px 20px;
+  border-top: 2px solid #444;
+}
+
+.footer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.zoom-controls, .reading-mode, .autoplay {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.zoom-btn {
+  background: #444;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-btn:hover {
+  background: #555;
+}
+
+.mode-select {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.autoplay label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.chapter-navigation {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #444;
+}
+
+.chapter-nav-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chapter-nav-btn:hover {
+  background: #0056b3;
+}
+
+/* Loading and Error States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #1a1a1a;
+  color: white;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #333;
+  border-top: 5px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-container h2 {
+  color: #f44336;
+  margin-bottom: 20px;
+}
+
+.error-container button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Keyboard Shortcuts Hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.8);
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #ccc;
+  z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reader-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .reader-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .chapter-select {
+    width: 100%;
+  }
+  
+  .reader-nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .footer-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .reader-page {
+    max-height: 70vh;
+  }
+}
