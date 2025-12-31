@@ -33,7 +33,12 @@ MangaQu---UI
 <img width="1899" height="917" alt="Screenshot 2025-11-30 155845" src="https://github.com/user-attachments/assets/d4e5c280-8aae-4795-aba5-ede8eccff34f" />
 <img width="1900" height="913" alt="Screenshot 2025-11-30 155902" src="https://github.com/user-attachments/assets/bc78983f-8391-4550-b92a-79b3a620fff4" />
 <img width="1904" height="916" alt="Screenshot 2025-11-30 155925" src="https://github.com/user-attachments/assets/390eec2e-d8d9-49fb-ba32-3230b0731789" />
-<img width="1904" height="895" alt="Screenshot 2025-11-30 155941" src="https://github.com/user-attachments/assets/3a348073-87d5-4fb0-93ca-ae749b373cb7" />
+<img width="1904" height="895" alt<img width="1903" height="957" alt="Screenshot 2026-01-01 011904" src="https://github.com/user-attachments/assets/476ecd6a-0d33-4db9-a404-0a50809ecb18" />
+="Screenshot 2025-11-30 155941" src="https://github.com/user-attachments/assets/3a348073-87d5-4fb0-93ca-ae749b373cb7" />
+<img width="1902" height="915" alt="Screenshot 2026-01-01 011931" src="https://github.com/user-attachments/assets/10e0e4fa-ecea-4e79-b48c-56548e33f10f" />
+<img width="1900" height="850" alt="Screenshot 2026-01-01 011948" src="https://github.com/user-attachments/assets/73daeae9-a974-4ae8-9338-05ce5de2a8b4" />
+<img width="1903" height="852" alt="Screenshot 2026-01-01 012002" src="https://github.com/user-attachments/assets/8c43b669-59f9-45ea-ba5d-673ccdc11804" />
+
 =======
 MangaQu - Read Manga Online Free
 
@@ -64,10 +69,13 @@ Frontend
 •	Material-UI Icons : Additional icons. 
 •	CSS3 : Styling and responsive design. 
 
-MangaQu---UI
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-<img width="1899" height="917" alt="Screenshot 2025-11-30 155845" src="https://github.com/user-attachments/assets/d4e5c280-8aae-4795-aba5-ede8eccff34f" />
-<img width="1900" height="913" alt="Screenshot 2025-11-30 155902" src="https://github.com/user-attachments/assets/bc78983f-8391-4550-b92a-79b3a620fff4" />
-<img width="1904" height="916" alt="Screenshot 2025-11-30 155925" src="https://github.com/user-attachments/assets/390eec2e-d8d9-49fb-ba32-3230b0731789" />
-<img width="1904" height="895" alt="Screenshot 2025-11-30 155941" src="https://github.com/user-attachments/assets/3a348073-87d5-4fb0-93ca-ae749b373cb7" />
->>>>>>> a5f9c75 (fixing client and updating the server)
+Backend
+• Node.js + Express.js
+• MySQL database
+• JWT (jsonwebtoken) for authentication
+• bcryptjs for password hashing
+• cors for secure client access
+• fs + path for scanning chapter image folders dynamically
+
+
+
