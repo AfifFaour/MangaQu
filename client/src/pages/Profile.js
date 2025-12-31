@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import './../styles/Profile.css';
+import './../styles/profile.css';
 import { 
   User, Settings, LogOut, Key, BookOpen, Heart, 
   History, CreditCard, Shield, HelpCircle 
