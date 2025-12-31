@@ -1,111 +1,203 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { chapterAPI } from '../../services/Api';
-import { useAuth } from '../../context/AuthContext';
-import '../../styles/Reader.css';
+// client/src/Components/mangaReader.js
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { chapterAPI } from "../../services/Api";
+import "../../styles/Reader.css";
 
 const Reader = () => {
-  const { chapterId } = useParams();
+  const { mangaId, chapterId } = useParams();
+  const navigate = useNavigate();
+
+  const safeMangaId = useMemo(() => (mangaId ? String(mangaId) : ""), [mangaId]);
+  const safeChapterId = useMemo(() => (chapterId ? String(chapterId) : ""), [chapterId]);
 
   const [pages, setPages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { user } = useAuth();
-
-  /* =========================
-     FETCH CHAPTER PAGES
-     ========================= */
+  // -----------------------------
+  // Fetch pages
+  // -----------------------------
   useEffect(() => {
     const fetchPages = async () => {
+      if (!safeChapterId) {
+        setError("Missing chapterId in URL.");
+        setPages([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const res = await chapterAPI.getChapterPages(chapterId);
-        setPages(res.data);
+        setError(null);
+
+        const res = await chapterAPI.getChapterPages(safeChapterId);
+
+        // Server returns: [{ imageUrl: "http://localhost:5001/Assets/..." }]
+        const raw = Array.isArray(res?.data) ? res.data : [];
+        const cleaned = raw
+          .filter((p) => p && typeof p.imageUrl === "string" && p.imageUrl.trim().length > 0)
+          .map((p) => ({ imageUrl: p.imageUrl.trim() }));
+
+        setPages(cleaned);
         setCurrentPage(1);
       } catch (err) {
-        console.error('Failed to load chapter pages', err);
+        const msg =
+          err?.response?.data?.error ||
+          (err?.response?.status ? `Request failed (${err.response.status})` : "Failed to load chapter pages");
+        setError(msg);
+        setPages([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPages();
-  }, [chapterId]);
+  }, [safeChapterId]);
 
-  /* =========================
-     READING PROGRESS
-     ========================= */
-  const saveReadingProgress = async (pageNumber) => {
-    if (!user) return;
+  const totalPages = pages.length;
+  const current = pages[currentPage - 1];
 
-    try {
-      await chapterAPI.saveReadingProgress({
-        chapterId,
-        pageNumber,
-      });
-    } catch (err) {
-      console.error('Failed to save reading progress', err);
-    }
+  const canPrev = currentPage > 1;
+  const canNext = currentPage < totalPages;
+
+  const goPrev = () => {
+    if (canPrev) setCurrentPage((p) => p - 1);
   };
 
-  /* =========================
-     NAVIGATION
-     ========================= */
-  const handleNextPage = () => {
-    if (currentPage < pages.length) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      saveReadingProgress(nextPage);
-    }
+  const goNext = () => {
+    if (canNext) setCurrentPage((p) => p + 1);
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      saveReadingProgress(prevPage);
-    }
+  const jumpTo = (value) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return;
+    const clamped = Math.min(Math.max(n, 1), totalPages);
+    setCurrentPage(clamped);
   };
 
-  /* =========================
-     UI STATES
-     ========================= */
-  if (loading) {
-    return <div className="reader-loading">Loading chapter...</div>;
+  // -----------------------------
+  // Keyboard navigation
+  // -----------------------------
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "Escape" && safeMangaId) navigate(`/manga/${safeMangaId}`);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canPrev, canNext, safeMangaId]);
+
+  // -----------------------------
+  // Preload next/prev images
+  // -----------------------------
+  useEffect(() => {
+    const nextUrl = pages[currentPage]?.imageUrl; // next
+    const prevUrl = pages[currentPage - 2]?.imageUrl; // prev
+
+    if (nextUrl) {
+      const img = new Image();
+      img.src = nextUrl;
+    }
+    if (prevUrl) {
+      const img = new Image();
+      img.src = prevUrl;
+    }
+  }, [currentPage, pages]);
+
+  // -----------------------------
+  // UI states
+  // -----------------------------
+  if (loading) return <div className="reader-loading">Loading chapter...</div>;
+
+  if (error) {
+    return (
+      <div className="reader-empty">
+        <div className="reader-error-text">{error}</div>
+        <div className="reader-actions">
+          {safeMangaId ? (
+            <Link to={`/manga/${safeMangaId}`} className="reader-back-btn">
+              Back to Manga
+            </Link>
+          ) : (
+            <Link to="/browse" className="reader-back-btn">
+              Back to Browse
+            </Link>
+          )}
+        </div>
+      </div>
+    );
   }
 
-  if (pages.length === 0) {
-    return <div className="reader-empty">No pages found.</div>;
+  if (!totalPages) {
+    return (
+      <div className="reader-empty">
+        <div className="reader-error-text">No pages found for this chapter.</div>
+        <div className="reader-actions">
+          {safeMangaId ? (
+            <Link to={`/manga/${safeMangaId}`} className="reader-back-btn">
+              Back to Manga
+            </Link>
+          ) : (
+            <Link to="/browse" className="reader-back-btn">
+              Back to Browse
+            </Link>
+          )}
+        </div>
+      </div>
+    );
   }
 
-  /* =========================
-     RENDER
-     ========================= */
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <div className="reader-container">
       <div className="reader-nav">
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>
+        <button className="reader-btn" onClick={goPrev} disabled={!canPrev}>
           Previous
         </button>
 
-        <span>
-          Page {currentPage} of {pages.length}
-        </span>
+        <div className="reader-page-indicator">
+          Page{" "}
+          <input
+            className="reader-page-input"
+            type="number"
+            min={1}
+            max={totalPages}
+            value={currentPage}
+            onChange={(e) => jumpTo(e.target.value)}
+          />{" "}
+          <span className="reader-page-total">of {totalPages}</span>
+        </div>
 
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage === pages.length}
-        >
+        <button className="reader-btn" onClick={goNext} disabled={!canNext}>
           Next
         </button>
+
+        {safeMangaId && (
+          <Link to={`/manga/${safeMangaId}`} className="reader-back-link">
+            Back to Manga
+          </Link>
+        )}
       </div>
 
       <div className="reader-content">
         <img
-          src={pages[currentPage - 1].imageUrl}
+          src={current?.imageUrl}
           alt={`Page ${currentPage}`}
           className="reader-page"
+          loading="lazy"
+          onError={(e) => {
+            // graceful fallback if an image file is missing
+            e.currentTarget.style.opacity = "0.4";
+            e.currentTarget.alt = "Image failed to load";
+          }}
         />
       </div>
     </div>

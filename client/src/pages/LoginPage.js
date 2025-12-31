@@ -1,107 +1,203 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/LoginPage.css';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import './../styles/Auth.css';
 
-const LoginPage = () => {
-  const [formData, setFormData] = useState({email: '',password: ''});
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+function LoginPage() {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
     });
-  };
+    const [showPassword, setShowPassword] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const { login, error, clearError, isAuthenticated, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+    const from = location.state?.from?.pathname || '/';
 
-    try {
-      console.log('Login attempt:', formData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (err) {
-      setError('Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Redirect if already logged in
+    useEffect(() => {
+        if (!authLoading && isAuthenticated()) {
+            const searchParams = new URLSearchParams(location.search);
+            const redirect = searchParams.get('redirect') || from;
+            
+            setTimeout(() => {
+                navigate(redirect, { replace: true });
+            }, 100);
+        }
+    }, [authLoading, isAuthenticated, navigate, from, location.search]);
 
-  return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-header">
-          <h1 className="login-title">Welcome Back</h1>
-          <p className="login-subtitle">Sign in to your MangaQu account</p>
-        </div>
+    // Clear error when user starts typing
+    useEffect(() => {
+        if (error && (formData.email || formData.password)) {
+            clearError();
+        }
+    }, [formData.email, formData.password, error, clearError]);
 
-        {error && <div className="error-message">{error}</div>}
+    const validateForm = () => {
+        const errors = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="form-input"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!emailRegex.test(formData.email)) {
+            errors.email = 'Please enter a valid email address';
+        }
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="form-input"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        if (!formData.password) {
+            errors.password = 'Password is required';
+        }
 
-          <div className="remember-forgot">
-            <div className="remember-me">
-              <input
-                type="checkbox"
-                id="remember"
-                className="remember-checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <label className="remember-label" htmlFor="remember">
-                Remember me
-              </label>
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        if (validationErrors[name]) {
+            setValidationErrors(prev => ({
+                ...prev,
+                [name]: undefined
+            }));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        setIsLoading(true);
+        
+        try {
+            const result = await login(formData.email, formData.password);
+            
+            if (result.success) {
+                const searchParams = new URLSearchParams(location.search);
+                const redirect = searchParams.get('redirect') || from;
+                navigate(redirect, { replace: true });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Show loading screen while auth is initializing
+    if (authLoading) {
+        return (
+            <div className="auth-loading">
+                <div className="loading-spinner"></div>
+                <p>Loading...</p>
             </div>
-            <Link to="/forgot-password" className="forgot-link">
-              Forgot password?
-            </Link>
-          </div>
+        );
+    }
 
-          <button 
-            type="submit" 
-            className="login-button"
-            disabled={loading}
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+    return (
+        <div className="auth-container">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <div className="auth-logo">
+                        <span className="logo-icon">📚</span>
+                        <h1>MangaQu</h1>
+                    </div>
+                    <h2>Login</h2>
+                    <p className="auth-subtitle">Enter your credentials to continue</p>
+                </div>
 
-        <div className="signup-link">
-          Don't have an account? 
-          <Link to="/signup">Sign up</Link>
+                {error && (
+                    <div className="auth-error">
+                        <span className="error-icon">⚠️</span>
+                        <div>
+                            <strong>Login failed</strong>
+                            <p>{error}</p>
+                        </div>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="email@example.com"
+                            required
+                            disabled={isLoading}
+                            className={validationErrors.email ? 'input-error' : ''}
+                            autoComplete="email"
+                        />
+                        {validationErrors.email && (
+                            <span className="error-message">{validationErrors.email}</span>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <div className="password-input">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                placeholder="••••••••"
+                                required
+                                disabled={isLoading}
+                                className={validationErrors.password ? 'input-error' : ''}
+                                autoComplete="current-password"
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                disabled={isLoading}
+                                tabIndex="-1"
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
+                        {validationErrors.password && (
+                            <span className="error-message">{validationErrors.password}</span>
+                        )}
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        className="auth-btn"
+                        disabled={isLoading || !formData.email || !formData.password}
+                    >
+                        {isLoading ? 'Signing in...' : 'Sign In'}
+                    </button>
+
+                    <div className="auth-footer">
+                        <p>
+                            Don't have an account?{' '}
+                            <Link 
+                                to="/signup" 
+                                className="auth-link"
+                                state={{ from: location.state?.from }}
+                            >
+                                Sign up
+                            </Link>
+                        </p>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>
-  );
-};
+    );
+}
 
 export default LoginPage;

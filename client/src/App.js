@@ -1,9 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, ProtectedRoute } from './context/AuthContext';
 import { MangaProvider } from './context/MangaContext';
 import NavBar from './Components/common/NavBar';
 import Footer from './Components/common/Footer';
+
+// Import all your page components
 import Home from './pages/Home';
 import Browse from './pages/Browse';
 import Newest from './pages/Newest';
@@ -15,9 +17,20 @@ import MangaDetail from './pages/MangaDetail';
 import Reading from './pages/Reading';
 import LoginPage from './pages/LoginPage';
 import SignUp from './pages/SignUp';
+import DashBoard from './pages/DashBoard';
+import Profile from './pages/Profile';
+import UserManagement from './pages/UserManagement';
+import MangaManagement from './pages/MangaManagement';
+import History from './pages/History';
+import Bookmarks from './pages/Bookmarks';
+import PageNotFound from './pages/PageNotFound';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Help from './pages/Help';
+
 import Reader from './Components/manga/Reader';
-import DashBoard from "./pages/admin/DashBoard";
-import MangaManagment from "./pages/admin/MangaManagment";
 
 import './App.css';
 
@@ -30,22 +43,77 @@ function App() {
             <NavBar />
             <main>
               <Routes>
+                {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/browse" element={<Browse />} />
                 <Route path="/newest" element={<Newest />} />
                 <Route path="/updated" element={<Updated />} />
-                <Route path="/favorite" element={<Favorite />} />
                 <Route path="/types" element={<Types />} />
                 <Route path="/types/:type" element={<Types />} />
                 <Route path="/genres" element={<Genres />} />
                 <Route path="/genres/:genre" element={<Genres />} />
                 <Route path="/manga/:id" element={<MangaDetail />} />
                 <Route path="/read/:mangaId/:chapterId" element={<Reading />} />
-                <Route path="/Reader" element={<Reader />} />
+                <Route path="/reader" element={<Reader />} />
+                
+                {/* Auth routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/admin" element={<DashBoard />} />
-                <Route path="/admin/manga" element={<MangaManagment />} />
+                
+                {/* Static pages */}
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/help" element={<Help />} />
+                
+                {/* Protected routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <DashBoard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/favorite" element={
+                  <ProtectedRoute>
+                    <Favorite />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/history" element={
+                  <ProtectedRoute>
+                    <History />
+                  </ProtectedRoute>
+                } />
+                <Route path="/bookmarks" element={
+                  <ProtectedRoute>
+                    <Bookmarks />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={
+                  <ProtectedRoute adminOnly>
+                    <DashBoard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/users" element={
+                  <ProtectedRoute adminOnly>
+                    <UserManagement />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/manga" element={
+                  <ProtectedRoute adminOnly>
+                    <MangaManagement />
+                  </ProtectedRoute>
+                } />
+                
+                {/* 404 page */}
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </main>
             <Footer />

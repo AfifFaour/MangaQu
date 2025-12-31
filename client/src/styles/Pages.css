@@ -1,327 +1,273 @@
-.browse-page {
-  min-height: 100vh;
-  background: #0f0f0f;
-  padding: 1rem 0;
+/* =====================================================
+   GLOBAL DARK THEME (MangaFire-style BLACK)
+===================================================== */
+
+:root {
+  --bg-main: #0a0a0a;
+  --bg-dark: #0f0f0f;
+  --bg-card: #141414;
+  --bg-hover: #1c1c1c;
+
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  --text-main: #ffffff;
+  --text-muted: #b0b0b0;
+
+  --accent: #ff4747;
+  --accent-soft: rgba(255, 71, 71, 0.18);
+
+  --radius: 14px;
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
 }
 
+/* =====================================================
+   PAGE WRAPPER
+===================================================== */
+
+.browse-page {
+  min-height: 100vh;
+  padding: 24px;
+  background: radial-gradient(
+    circle at top,
+    #1a1a1a 0%,
+    #0a0a0a 55%
+  );
+}
+
+/* =====================================================
+   PAGE HERO / HEADER
+===================================================== */
+
 .browse-header {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 42px 30px;
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 0 1rem;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
+  border-radius: var(--radius);
+  background: linear-gradient(
+    180deg,
+    #1a1a1a,
+    #0d0d0d
+  );
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 
 .browse-header h1 {
-  color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: clamp(26px, 2.8vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
 }
 
 .browse-header p {
-  color: #ccc;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-/* Time Filter for Most Viewed */
-.time-filter {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
+/* =====================================================
+   SORT / TAB BUTTONS (Updated / Newest)
+===================================================== */
 
-.time-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #444;
-  color: #ccc;
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-}
-
-.time-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #666;
-  color: white;
-}
-
-.time-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-}
-
-/* Sort Options for Newest Page */
 .sort-options {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
 }
 
 .sort-option {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #444;
-  color: #ccc;
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
 .sort-option:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #666;
-  color: white;
+  background: var(--bg-hover);
+  color: var(--text-main);
 }
 
 .sort-option.active {
-  background: #8b5cf6;
-  border-color: #8b5cf6;
-  color: white;
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
-/* Favorites Specific Styles */
-.favorites-header {
+/* =====================================================
+   GRID CONTROLS (SEARCH / SORT / VIEW)
+===================================================== */
+
+.manga-grid-controls,
+.grid-controls {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
 }
 
-.favorites-icon {
-  color: #ef4444;
+.manga-grid-controls input,
+.manga-grid-controls select {
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
 }
 
-.favorites-stats {
-  margin-top: 1rem;
-  color: #888;
-  font-size: 0.9rem;
+.manga-grid-controls input::placeholder {
+  color: #777;
 }
 
-/* Auth Required State */
-.auth-required {
-  text-align: center;
-  padding: 4rem 2rem;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.auth-icon {
-  color: #ef4444;
-  margin-bottom: 1.5rem;
-}
-
-.auth-required h2 {
-  color: white;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.auth-required p {
-  color: #ccc;
-  margin-bottom: 2rem;
-}
-
-.auth-button {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
+.manga-grid-controls button {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.auth-button:hover {
-  background: #dc2626;
-  transform: translateY(-1px);
+.manga-grid-controls button:hover {
+  background: var(--bg-hover);
 }
 
-/* Empty Favorites State */
-.empty-favorites {
-  text-align: center;
-  padding: 4rem 2rem;
-  max-width: 500px;
-  margin: 0 auto;
-}
+/* =====================================================
+   FILTER CHIPS (GENRES / STATUS)
+===================================================== */
 
-.empty-icon {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.empty-favorites h2 {
-  color: white;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.empty-favorites p {
-  color: #ccc;
-  margin-bottom: 2rem;
-}
-
-.browse-button {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.browse-button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .browse-header h1 {
-    font-size: 1.75rem;
-  }
-
-  .favorites-header {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .time-filter {
-    flex-wrap: wrap;
-  }
-
-  .time-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  .sort-options {
-    flex-wrap: wrap;
-  }
-
-  .sort-option {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .browse-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .time-filter {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .time-btn {
-    width: 150px;
-  }
-
-  .sort-options {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .sort-option {
-    width: 200px;
-  }
-}
-.filter-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.type-filters {
+.filter-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 8px;
+  margin: 14px 0;
 }
 
-.type-filter {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #333;
-  background: transparent;
-  color: #ccc;
-  border-radius: 8px;
+.filter-chip {
+  background: #111;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  transition: all 0.15s ease;
 }
 
-.type-filter:hover {
-  border-color: #555;
-  color: white;
+.filter-chip:hover {
+  color: #fff;
+  border-color: var(--border-strong);
 }
 
-.type-filter.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
+.filter-chip.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
-.sort-options {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+/* =====================================================
+   MANGA GRID
+===================================================== */
+
+.manga-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 18px;
 }
 
-.sort-option {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #333;
-  background: transparent;
-  color: #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+@media (max-width: 1200px) {
+  .manga-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
-.sort-option:hover {
-  border-color: #555;
-  color: white;
-}
-
-.sort-option.active {
-  background: #10b981;
-  border-color: #10b981;
-  color: white;
-}
-
-/* Responsive design */
 @media (max-width: 768px) {
-  .type-filters {
-    gap: 0.5rem;
+  .manga-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .type-filter {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  
-  .sort-options {
-    gap: 0.5rem;
-  }
-  
-  .sort-option {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
+}
+
+/* =====================================================
+   MANGA CARD
+===================================================== */
+
+.manga-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.7);
+}
+
+.manga-card:hover {
+  transform: translateY(-4px);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.manga-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.manga-card .info {
+  padding: 12px;
+}
+
+.manga-card .title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.manga-card .meta {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* =====================================================
+   EMPTY / ERROR STATES
+===================================================== */
+
+.error {
+  text-align: center;
+  color: var(--accent);
+  padding: 40px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   LOADING PLACEHOLDER
+===================================================== */
+
+.loading {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+/* =====================================================
+   FAVORITE PAGE FIX
+===================================================== */
+
+.favorite-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 80px 20px;
 }

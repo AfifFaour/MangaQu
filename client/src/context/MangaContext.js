@@ -1,38 +1,35 @@
+// src/context/MangaContext.js
+import React, { createContext, useContext, useEffect, useState } from "react";
+import api from "../services/Api";
 
-import React, { createContext, useContext, useState } from 'react';
-import { mangaData } from '../pages/mangaData';
-
-const MangaContext = createContext();
-
-export const useManga = () => {
-  const context = useContext(MangaContext);
-  if (!context) {
-    throw new Error('useManga must be used within a MangaProvider');
-  }
-  return context;
-};
+const MangaContext = createContext(null);
 
 export const MangaProvider = ({ children }) => {
-  const [bookmarks, setBookmarks] = useState([]);
+  const [mangas, setMangas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const addBookmark = (manga) => {
-    setBookmarks(prev => [...prev, manga]);
+  const refreshMangas = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/manga");
+      setMangas(Array.isArray(res.data) ? res.data : []);
+    } catch (e) {
+      console.error("Failed to load manga", e);
+      setMangas([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeBookmark = (mangaId) => {
-    setBookmarks(prev => prev.filter(manga => manga.id !== mangaId));
-  };
-
-  const value = {
-    mangaList: mangaData, 
-    bookmarks,
-    addBookmark,
-    removeBookmark
-  };
+  useEffect(() => {
+    refreshMangas();
+  }, []);
 
   return (
-    <MangaContext.Provider value={value}>
+    <MangaContext.Provider value={{ mangas, loading, refreshMangas }}>
       {children}
     </MangaContext.Provider>
   );
 };
+
+export const useManga = () => useContext(MangaContext);

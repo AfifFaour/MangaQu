@@ -1,23 +1,209 @@
-.browse-page {
-  min-height: 100vh;
-  background: #0f0f0f;
-  padding: 1rem 0; /* Reduced from 2rem */
+/* src/styles/Browse.css */
+
+:root{
+  --bg: #0b0f14;
+  --panel: rgba(255,255,255,0.06);
+  --panel2: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.08);
+  --text: #e5e7eb;
+  --muted: rgba(229,231,235,0.72);
+  --muted2: rgba(229,231,235,0.55);
+  --shadow: 0 18px 45px rgba(0,0,0,0.45);
+  --shadow2: 0 10px 28px rgba(0,0,0,0.35);
+  --accent: #ff4444;
+  --accentGlow: rgba(255, 68, 68, 0.20);
 }
 
-.browse-header {
+.browse-page{
+  min-height: calc(100vh - 80px);
+  padding: 26px 16px 60px;
+  background:
+    radial-gradient(1100px 650px at 50% -50px, rgba(255,68,68,0.14), transparent 55%),
+    radial-gradient(800px 500px at 15% 10%, rgba(59,130,246,0.10), transparent 55%),
+    radial-gradient(900px 600px at 85% 10%, rgba(16,185,129,0.07), transparent 60%),
+    var(--bg);
+  color: var(--text);
+}
+
+.browse-page > *{
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== Header Card ===== */
+.browse-header{
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 22px 22px;
+  margin-bottom: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow2);
+  backdrop-filter: blur(10px);
+}
+
+.browse-header::before{
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(500px 120px at 50% 0%, rgba(255,68,68,0.22), transparent 65%);
+  pointer-events: none;
+}
+
+.browse-header h1{
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw, 2.15rem);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: #fff;
   text-align: center;
-  margin-bottom: 2rem; /* Reduced from 3rem */
-  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
 }
 
-.browse-header h1 {
-  color: white;
-  font-size: 2rem; /* Reduced from 2.5rem */
-  font-weight: 700;
-  margin-bottom: 0.5rem; /* Reduced from 1rem */
+.browse-header p{
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  position: relative;
+  z-index: 1;
 }
 
-.browse-header p {
-  color: #ccc;
-  font-size: 1rem; /* Reduced from 1.1rem */
+/* ===== Error ===== */
+.browse-page .error{
+  margin-top: 12px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #fecaca;
+  padding: 14px 16px;
+  border-radius: 14px;
+  box-shadow: var(--shadow2);
+}
+
+/* ===== MangaGrid Section Polish (works even if MangaGrid defines its own header) ===== */
+.browse-page h2,
+.browse-page .grid-title,
+.browse-page .manga-grid-title{
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.browse-page .manga-grid,
+.browse-page .manga-grid-container{
+  margin-top: 10px;
+}
+
+/* If your MangaGrid has a header row with title + filters */
+.browse-page .manga-grid-header,
+.browse-page .grid-header,
+.browse-page .mangaGridHeader{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 18px 0 12px;
+  padding: 10px 2px;
+}
+
+.browse-page .manga-grid-header h2,
+.browse-page .grid-header h2{
+  margin: 0;
+  font-size: 1.35rem;
+  color: #fff;
+}
+
+/* Filter bar wrapper */
+.browse-page .filters,
+.browse-page .manga-filters,
+.browse-page .grid-filters{
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+}
+
+/* Inputs / selects inside filters */
+.browse-page input,
+.browse-page select{
+  background: rgba(17,24,39,0.55);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.browse-page input::placeholder{
+  color: rgba(229,231,235,0.45);
+}
+
+.browse-page input:focus,
+.browse-page select:focus{
+  border-color: rgba(255,68,68,0.60);
+  box-shadow: 0 0 0 3px var(--accentGlow);
+}
+
+/* ===== “Missing cover” fallback (for cards that already render <img>) =====
+   If an image fails, most browsers show broken icon.
+   Better: hide broken image and show a nice placeholder.
+   To make this 100% perfect, add onError in MangaCard, but this CSS helps too.
+*/
+.manga-image{
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+}
+
+.manga-image:not([src]),
+.manga-image[src=""]{
+  opacity: 0;
+}
+
+/* Optional: if your card uses a container like .manga-image-container */
+.manga-image-container{
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Placeholder overlay text when image missing (works best if you add class "has-no-cover" to card) */
+.manga-card.has-no-cover .manga-image-container::after{
+  content: "NO COVER";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  font-size: 0.85rem;
+  color: rgba(229,231,235,0.55);
+  background:
+    radial-gradient(800px 250px at 50% 0%, rgba(255,68,68,0.15), transparent 65%),
+    linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px){
+  .browse-header{
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 768px){
+  .browse-page{
+    padding: 18px 12px 50px;
+  }
+  .browse-header{
+    padding: 18px 16px;
+  }
+  .browse-page .manga-grid-header,
+  .browse-page .grid-header{
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

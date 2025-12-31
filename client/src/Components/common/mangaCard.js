@@ -1,100 +1,106 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, Heart, Clock, Star } from 'lucide-react';
-import '../../styles/MangaCard.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Eye, Heart, Clock, Star } from "lucide-react";
+import { toAssetUrl } from "../../services/Api";
+import "../../styles/MangaCard.css";
 
-const MangaCard = ({ manga, viewMode = 'grid' }) => {
+const MangaCard = ({ manga, viewMode = "grid" }) => {
   const {
     id,
     title,
     description,
     views = 0,
-    likes = 0,
     rating,
     status,
     type,
     genres,
     chapters,
     chaptersCount,
-    image,
+    cover_image,
     coverImage,
+    image,
     lastUpdated,
-    updatedAt
+    updated_at,
+    updatedAt,
   } = manga;
 
-  const cover = image || coverImage || '/placeholder-manga.jpg';
+  const coverPath = cover_image || coverImage || image;
+  const cover = coverPath ? toAssetUrl(coverPath) : "/placeholder-manga.jpg";
+
   const chapterTotal = chaptersCount ?? chapters ?? 0;
 
   const genreList = Array.isArray(genres)
     ? genres
-    : typeof genres === 'string'
-    ? genres.split(',')
+    : typeof genres === "string"
+    ? genres.split(",").map((g) => g.trim()).filter(Boolean)
     : [];
 
   const truncateText = (text, maxLength) => {
-    if (!text) return '';
-    return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
+    if (!text) return "";
+    return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'ongoing': return '#10b981';
-      case 'completed': return '#3b82f6';
-      case 'hiatus': return '#f59e0b';
-      default: return '#6b7280';
+  const getStatusColor = (s) => {
+    switch (String(s || "").toLowerCase()) {
+      case "ongoing":
+        return "#10b981";
+      case "completed":
+        return "#3b82f6";
+      case "hiatus":
+        return "#f59e0b";
+      default:
+        return "#6b7280";
     }
   };
 
-  const getTypeColor = (type) => {
-    switch (type?.toLowerCase()) {
-      case 'manga': return '#ef4444';
-      case 'manhwa': return '#8b5cf6';
-      case 'manhua': return '#06b6d4';
-      default: return '#6b7280';
+  const getTypeColor = (t) => {
+    switch (String(t || "").toLowerCase()) {
+      case "manga":
+        return "#ef4444";
+      case "manhwa":
+        return "#8b5cf6";
+      case "manhua":
+        return "#06b6d4";
+      case "one-shot":
+        return "#f59e0b";
+      case "novel":
+        return "#10b981";
+      case "doujinshi":
+        return "#64748b";
+      default:
+        return "#6b7280";
     }
   };
+
+  const updatedLabel = updated_at || updatedAt || lastUpdated;
 
   return (
-    <div className={`manga-card ${viewMode === 'list' ? 'list-view' : ''}`}>
+    <div className={`manga-card ${viewMode === "list" ? "list-view" : ""}`}>
       <Link to={`/manga/${id}`} className="manga-card-link">
         <div className="manga-image-container">
-          <img
-            src={cover}
-            alt={title}
-            className="manga-image"
-            loading="lazy"
-          />
+          <img src={cover} alt={title} className="manga-image" loading="lazy" />
 
           <div className="manga-overlay">
-            <button
-              className="action-btn"
-              onClick={(e) => e.preventDefault()}
-            >
+            <button className="action-btn" onClick={(e) => e.preventDefault()}>
               <Heart size={16} />
             </button>
 
-            {rating && (
+            {rating !== null && rating !== undefined && (
               <div className="rating-badge">
                 <Star size={12} fill="currentColor" />
-                <span>{rating}</span>
+                <span>{Number(rating).toFixed(1)}</span>
               </div>
             )}
           </div>
 
           {status && (
-            <span
-              className="status-badge"
-              style={{ backgroundColor: getStatusColor(status) }}
-            >
+            <span className="status-badge" style={{ backgroundColor: getStatusColor(status) }}>
               {status}
             </span>
           )}
 
           {type && (
-            <span
-              className="type-badge"
-              style={{ backgroundColor: getTypeColor(type) }}
-            >
+            <span className="type-badge" style={{ backgroundColor: getTypeColor(type) }}>
               {type}
             </span>
           )}
@@ -105,9 +111,7 @@ const MangaCard = ({ manga, viewMode = 'grid' }) => {
             {truncateText(title, 40)}
           </h3>
 
-          <p className="manga-description">
-            {truncateText(description || 'No description available.', 80)}
-          </p>
+          <p className="manga-description">{truncateText(description || "No description available.", 80)}</p>
 
           {genreList.length > 0 && (
             <div className="manga-genres">
@@ -116,21 +120,13 @@ const MangaCard = ({ manga, viewMode = 'grid' }) => {
                   {g}
                 </span>
               ))}
-              {genreList.length > 2 && (
-                <span className="genre-tag-more">
-                  +{genreList.length - 2}
-                </span>
-              )}
+              {genreList.length > 2 && <span className="genre-tag-more">+{genreList.length - 2}</span>}
             </div>
           )}
 
           <div className="manga-meta">
             <span className="meta-item">
-              <Eye size={14} /> {views.toLocaleString()}
-            </span>
-
-            <span className="meta-item">
-              <Heart size={14} /> {likes.toLocaleString()}
+              <Eye size={14} /> {Number(views || 0).toLocaleString()}
             </span>
 
             <span className="meta-item">
@@ -138,11 +134,7 @@ const MangaCard = ({ manga, viewMode = 'grid' }) => {
             </span>
           </div>
 
-          {(updatedAt || lastUpdated) && (
-            <div className="last-updated">
-              Updated {updatedAt || lastUpdated}
-            </div>
-          )}
+          {updatedLabel && <div className="last-updated">Updated {String(updatedLabel)}</div>}
         </div>
       </Link>
     </div>

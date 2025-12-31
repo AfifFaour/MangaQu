@@ -1,74 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import MangaGrid from '../Components/manga/MangaGrid';
-import { mangaAPI } from '../services/Api';
-import '../styles/Pages.css';
+// client/src/pages/Newest.js
+import React, { useEffect, useMemo, useState } from "react";
+import MangaGrid from "../Components/manga/MangaGrid";
+import api from "../services/Api";
+import "../styles/Pages.css";
 
 const Newest = () => {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('newest');
+  const [sortBy, setSortBy] = useState("newest"); // newest | recently-added
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchNewestManga = async () => {
+    const fetchManga = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        let res;
-        if (sortBy === 'recently-added') {
-          res = await mangaAPI.getUpdatedManga();
-        } else {
-          res = await mangaAPI.getNewestManga();
-        }
-
-        setMangas(res.data);
+        const res = await api.get("/manga");
+        setMangas(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        setError('Failed to load newest manga');
+        console.error(err);
+        setError("Failed to load newest manga");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNewestManga();
-  }, [sortBy]);
+    fetchManga();
+  }, []);
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  const sortedManga = useMemo(() => {
+    const copy = [...mangas];
+
+    if (sortBy === "recently-added") {
+      // updated_at DESC
+      copy.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+    } else {
+      // created_at DESC
+      copy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+
+    return copy;
+  }, [mangas, sortBy]);
+
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="browse-page">
       <div className="browse-header">
         <h1>Newest Manga</h1>
-        <p>Discover the latest manga and manhwa releases</p>
+        <p>Discover the latest manga added to the library</p>
 
         <div className="sort-options">
           <button
-            className={`sort-option ${sortBy === 'newest' ? 'active' : ''}`}
-            onClick={() => setSortBy('newest')}
+            className={`sort-option ${sortBy === "newest" ? "active" : ""}`}
+            onClick={() => setSortBy("newest")}
           >
             Newest Releases
           </button>
 
           <button
-            className={`sort-option ${
-              sortBy === 'recently-added' ? 'active' : ''
-            }`}
-            onClick={() => setSortBy('recently-added')}
+            className={`sort-option ${sortBy === "recently-added" ? "active" : ""}`}
+            onClick={() => setSortBy("recently-added")}
           >
-            Recently Added
+            Recently Updated
           </button>
         </div>
       </div>
 
       <MangaGrid
-        mangas={mangas}
-        title={
-          sortBy === 'recently-added'
-            ? 'Newest (Recently Added)'
-            : 'Newest (Latest Releases)'
-        }
+        mangas={sortedManga}
+        title={sortBy === "recently-added" ? "Recently Updated" : "Newest Releases"}
         loading={loading}
         showFilters={true}
       />

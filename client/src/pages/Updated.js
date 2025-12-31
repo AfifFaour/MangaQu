@@ -1,41 +1,61 @@
-import React, { useEffect, useState } from 'react';
-import MangaGrid from '../Components/manga/MangaGrid';
-import api from '../services/Api';
-import '../styles/Pages.css';
+// src/pages/Updated.js
+import React, { useEffect, useMemo, useState } from "react";
+import MangaGrid from "../Components/manga/MangaGrid";
+import api from "../services/Api"; // axios instance with baseURL = http://localhost:5001/api
+import "../styles/Pages.css";
 
 const Updated = () => {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('recently-updated');
-  const [error, setError] = useState(null);
+  const [sortBy, setSortBy] = useState("recently-updated");
+  const [error, setError] = useState("");
+
+  // Map UI sort -> server sort param
+  const serverSort = useMemo(() => {
+    if (sortBy === "popular") return "popular";
+    if (sortBy === "highest-rated") return "rating";
+    return "updated";
+  }, [sortBy]);
 
   useEffect(() => {
+    let alive = true;
+
     const fetchUpdatedManga = async () => {
       try {
         setLoading(true);
-        setError(null);
+        setError("");
 
-        const res = await api.get('/v1/manga', {
-          params: {
-            sort: sortBy
-          }
+        // ✅ uses your server: GET /api/manga?sort=updated|popular|rating
+        const res = await api.get(`/manga`, {
+          params: { sort: serverSort },
         });
 
-        setMangas(res.data);
+        if (!alive) return;
+
+        setMangas(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error(err);
-        setError('Failed to load updated manga');
+        if (!alive) return;
+        setMangas([]);
+        setError(err?.response?.data?.error || "Failed to load updated manga");
       } finally {
+        if (!alive) return;
         setLoading(false);
       }
     };
 
     fetchUpdatedManga();
-  }, [sortBy]);
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+    return () => {
+      alive = false;
+    };
+  }, [serverSort]);
+
+  const pageTitle =
+    sortBy === "popular"
+      ? "Updated Manga (Most Popular)"
+      : sortBy === "highest-rated"
+      ? "Updated Manga (Highest Rated)"
+      : "Updated Manga (Latest Updates)";
 
   return (
     <div className="browse-page">
@@ -45,40 +65,34 @@ const Updated = () => {
 
         <div className="sort-options">
           <button
-            className={`sort-option ${sortBy === 'recently-updated' ? 'active' : ''}`}
-            onClick={() => setSortBy('recently-updated')}
+            type="button"
+            className={`sort-option ${sortBy === "recently-updated" ? "active" : ""}`}
+            onClick={() => setSortBy("recently-updated")}
           >
             Recently Updated
           </button>
 
           <button
-            className={`sort-option ${sortBy === 'popular' ? 'active' : ''}`}
-            onClick={() => setSortBy('popular')}
+            type="button"
+            className={`sort-option ${sortBy === "popular" ? "active" : ""}`}
+            onClick={() => setSortBy("popular")}
           >
             Most Popular
           </button>
 
           <button
-            className={`sort-option ${sortBy === 'highest-rated' ? 'active' : ''}`}
-            onClick={() => setSortBy('highest-rated')}
+            type="button"
+            className={`sort-option ${sortBy === "highest-rated" ? "active" : ""}`}
+            onClick={() => setSortBy("highest-rated")}
           >
             Highest Rated
           </button>
         </div>
+
+        {error && <div className="error" style={{ marginTop: 12 }}>{error}</div>}
       </div>
 
-      <MangaGrid
-        mangas={mangas}
-        title={
-          sortBy === 'popular'
-            ? 'Updated Manga (Most Popular)'
-            : sortBy === 'highest-rated'
-            ? 'Updated Manga (Highest Rated)'
-            : 'Updated Manga (Latest Updates)'
-        }
-        loading={loading}
-        showFilters={true}
-      />
+      <MangaGrid mangas={mangas} title={pageTitle} loading={loading} showFilters />
     </div>
   );
 };

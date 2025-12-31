@@ -1,98 +1,142 @@
-// src/pages/Reading.js
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/Api';
-import '../styles/Reading.css';
+// client/src/pages/Reading.js
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../services/Api";
+import "../styles/Reading.css";
 
 const Reading = () => {
   const { mangaId, chapterId } = useParams();
   const navigate = useNavigate();
 
+  const safeMangaId = useMemo(() => (mangaId ? String(mangaId) : ""), [mangaId]);
+  const safeChapterId = useMemo(() => (chapterId ? String(chapterId) : ""), [chapterId]);
+
   const [manga, setManga] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [currentChapter, setCurrentChapter] = useState(null);
+
   const [pages, setPages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  /* =========================
-     FETCH DATA
-     ========================= */
+  // -----------------------------
+  // Fetch Manga + Chapters + Pages
+  // -----------------------------
   useEffect(() => {
-    fetchReadingData();
-  }, [mangaId, chapterId]);
-
-  const fetchReadingData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const [mangaRes, chaptersRes, pagesRes] = await Promise.all([
-        api.get(`/v1/manga/${mangaId}`),
-        api.get(`/v1/manga/${mangaId}/chapters`),
-        api.get(`/v1/chapters/${chapterId}/pages`)
-      ]);
-
-      setManga(mangaRes.data);
-      setChapters(chaptersRes.data);
-
-      const chapter = chaptersRes.data.find(
-        ch => ch.id === Number(chapterId)
-      );
-
-      if (!chapter) {
-        throw new Error('Chapter not found');
+    const fetchReadingData = async () => {
+      if (!safeMangaId || !safeChapterId) {
+        setError("Missing mangaId or chapterId in URL.");
+        setLoading(false);
+        return;
       }
 
-      setCurrentChapter(chapter);
-      setPages(pagesRes.data);
-      setCurrentPage(1);
+      try {
+        setLoading(true);
+        setError(null);
 
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load chapter');
-    } finally {
-      setLoading(false);
-    }
-  };
+        // NOTE: your axios baseURL already includes /api
+        const [mangaRes, chaptersRes, pagesRes] = await Promise.all([
+          api.get(`/manga/${safeMangaId}`),
+          api.get(`/manga/${safeMangaId}/chapters`),
+          api.get(`/chapters/${safeChapterId}/pages`),
+        ]);
 
-  /* =========================
-     PAGE NAVIGATION
-     ========================= */
-  const handlePageChange = (direction) => {
-    if (direction === 'next' && currentPage < pages.length) {
-      setCurrentPage(p => p + 1);
-    }
+        // Manga
+        setManga(mangaRes?.data ?? null);
 
-    if (direction === 'prev' && currentPage > 1) {
-      setCurrentPage(p => p - 1);
-    }
-  };
+        // Chapters mapping
+        const rawChapters = Array.isArray(chaptersRes?.data) ? chaptersRes.data : [];
+        const mappedChapters = rawChapters
+          .map((c) => ({
+            id: String(c.id),
+            number: Number(c.chapter_number ?? c.number ?? 0),
+            title: c.title || `Chapter ${c.chapter_number ?? c.number ?? ""}`,
+            date: c.created_at ?? null,
+            views: Number(c.view_count ?? 0),
+          }))
+          .sort((a, b) => a.number - b.number);
 
-  /* =========================
-     CHAPTER NAVIGATION
-     ========================= */
-  const handleChapterChange = (newChapterId) => {
-    navigate(`/manga/${mangaId}/chapter/${newChapterId}`);
-  };
+        setChapters(mappedChapters);
 
-  /* =========================
-     KEYBOARD CONTROLS
-     ========================= */
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === 'ArrowLeft') handlePageChange('prev');
-      if (e.key === 'ArrowRight') handlePageChange('next');
+        // Current chapter (IMPORTANT: compare as strings)
+        const found = mappedChapters.find((ch) => ch.id === safeChapterId) || null;
+        setCurrentChapter(found);
+
+        // Pages: server returns [{ imageUrl }]
+        const rawPages = Array.isArray(pagesRes?.data) ? pagesRes.data : [];
+        const cleanedPages = rawPages
+          .filter((p) => p && typeof p.imageUrl === "string")
+          .map((p) => ({ imageUrl: p.imageUrl }));
+
+        setPages(cleanedPages);
+        setCurrentPage(1);
+      } catch (err) {
+        const msg =
+          err?.response?.data?.error ||
+          (err?.response?.status ? `Request failed (${err.response.status})` : "Failed to load chapter");
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [currentPage, pages.length]);
+    fetchReadingData();
+  }, [safeMangaId, safeChapterId]);
 
-  /* =========================
-     STATES
-     ========================= */
+  // -----------------------------
+  // Page navigation
+  // -----------------------------
+  const canPrev = currentPage > 1;
+  const canNext = currentPage < pages.length;
+
+  const goPrev = () => {
+    if (canPrev) setCurrentPage((p) => p - 1);
+  };
+
+  const goNext = () => {
+    if (canNext) setCurrentPage((p) => p + 1);
+  };
+
+  // Keyboard controls
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canPrev, canNext]);
+
+  // Preload next/prev images (makes reading smoother)
+  useEffect(() => {
+    const nextUrl = pages[currentPage]?.imageUrl;
+    const prevUrl = pages[currentPage - 2]?.imageUrl;
+
+    if (nextUrl) {
+      const img = new Image();
+      img.src = nextUrl;
+    }
+    if (prevUrl) {
+      const img = new Image();
+      img.src = prevUrl;
+    }
+  }, [currentPage, pages]);
+
+  // -----------------------------
+  // Chapter navigation
+  // -----------------------------
+  const handleChapterChange = (newChapterId) => {
+    // match your route: /read/:mangaId/:chapterId
+    navigate(`/read/${safeMangaId}/${String(newChapterId)}`);
+  };
+
+  // -----------------------------
+  // UI states
+  // -----------------------------
   if (loading) {
     return (
       <div className="loading-container">
@@ -105,9 +149,7 @@ const Reading = () => {
     return (
       <div className="error-container">
         <p>{error}</p>
-        <button onClick={() => navigate(`/manga/${mangaId}`)}>
-          Back to Manga
-        </button>
+        <button onClick={() => navigate(`/manga/${safeMangaId}`)}>Back to Manga</button>
       </div>
     );
   }
@@ -116,56 +158,66 @@ const Reading = () => {
     return (
       <div className="error-container">
         <p>No pages found.</p>
+        <button onClick={() => navigate(`/manga/${safeMangaId}`)}>Back to Manga</button>
       </div>
     );
   }
 
-  /* =========================
-     RENDER
-     ========================= */
+  // -----------------------------
+  // Render
+  // -----------------------------
+  const currentImageUrl = pages[currentPage - 1]?.imageUrl;
+
   return (
     <div className="reading-container">
       <div className="reader-header">
-        <h1>{manga?.title}</h1>
-        <h2>
-          Chapter {currentChapter?.number}: {currentChapter?.title}
-        </h2>
-        <p>Page {currentPage} of {pages.length}</p>
+        <div className="reader-header-top">
+          <button className="reader-back-btn" onClick={() => navigate(`/manga/${safeMangaId}`)}>
+            Back
+          </button>
 
-        <select
-          value={currentChapter.id}
-          onChange={(e) => handleChapterChange(e.target.value)}
-        >
-          {chapters.map(ch => (
-            <option key={ch.id} value={ch.id}>
-              Chapter {ch.number}
-            </option>
-          ))}
-        </select>
+          <div className="reader-title-wrap">
+            <h1 className="reader-manga-title">{manga?.title || "Manga"}</h1>
+            <h2 className="reader-chapter-title">
+              Chapter {currentChapter?.number ?? "?"}
+              {currentChapter?.title ? ` — ${currentChapter.title}` : ""}
+            </h2>
+          </div>
+
+          {chapters.length > 0 ? (
+            <select
+              className="reader-chapter-select"
+              value={safeChapterId}
+              onChange={(e) => handleChapterChange(e.target.value)}
+            >
+              {chapters.map((ch) => (
+                <option key={ch.id} value={ch.id}>
+                  Chapter {ch.number}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div />
+          )}
+        </div>
+
+        <div className="reader-progress">
+          Page <strong>{currentPage}</strong> of <strong>{pages.length}</strong>
+        </div>
       </div>
 
       <div className="reader-nav">
-        <button
-          onClick={() => handlePageChange('prev')}
-          disabled={currentPage === 1}
-        >
+        <button className="reader-btn" onClick={goPrev} disabled={!canPrev}>
           Previous
         </button>
 
-        <button
-          onClick={() => handlePageChange('next')}
-          disabled={currentPage === pages.length}
-        >
+        <button className="reader-btn" onClick={goNext} disabled={!canNext}>
           Next
         </button>
       </div>
 
       <div className="reader-content">
-        <img
-          src={pages[currentPage - 1]?.imageUrl}
-          alt={`Page ${currentPage}`}
-          className="reader-page"
-        />
+        <img src={currentImageUrl} alt={`Page ${currentPage}`} className="reader-page" loading="lazy" />
       </div>
     </div>
   );

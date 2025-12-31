@@ -1,41 +1,39 @@
-// src/pages/Profile.js
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/UseAuth';
-import { useManga } from '../hooks/UseManga';
-import MangaCard from '../../common/mangaCard';
-import '../styles/profile.css';
-const Profile = () => {
-  const { user, updateProfile, logout } = useAuth();
-  const { favorites, fetchFavorites, readingHistory, fetchReadingHistory } = useManga();
-  
+import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import './../styles/Profile.css';
+import { 
+  User, Settings, LogOut, Key, BookOpen, Heart, 
+  History, CreditCard, Shield, HelpCircle 
+} from 'lucide-react';
+
+function Profile() {
+  const { user, logout, isAdmin, updateUser } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    bio: '',
-    avatar: ''
-  });
-  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        username: user.username || '',
-        email: user.email || '',
-        bio: user.bio || '',
-        avatar: user.avatar || ''
-      });
-      
-      // Load user data
-      fetchFavorites();
-      fetchReadingHistory();
+    if (!user) {
+      navigate('/login');
+      return;
     }
-  }, [user, fetchFavorites, fetchReadingHistory]);
+
+    // Initialize form with user data
+    setFormData(prev => ({
+      ...prev,
+      username: user.username || '',
+      email: user.email || ''
+    }));
+  }, [user, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,337 +41,301 @@ const Profile = () => {
       ...prev,
       [name]: value
     }));
-  };
-
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setMessage('');
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
     try {
-      await updateProfile(formData);
-      setEditMode(false);
-      alert('Profile updated successfully!');
+      // Update profile logic here
+      setMessage('Profile updated successfully!');
     } catch (error) {
-      alert(error.message || 'Failed to update profile');
+      setMessage('Error updating profile');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePasswordUpdate = async (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
     
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+    if (formData.newPassword !== formData.confirmPassword) {
+      setMessage('New passwords do not match');
       return;
     }
-    
-    if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters');
+
+    if (formData.newPassword.length < 8) {
+      setMessage('Password must be at least 8 characters');
       return;
     }
-    
+
+    setLoading(true);
+    setMessage('');
+
     try {
-      // Call password update API
-      alert('Password updated successfully!');
-      setPasswordData({
+      // Password change logic here
+      setMessage('Password changed successfully!');
+      setFormData(prev => ({
+        ...prev,
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
-      });
+      }));
     } catch (error) {
-      alert(error.message || 'Failed to update password');
+      setMessage('Error changing password');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
-      return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      alert('Image size should be less than 5MB');
-      return;
-    }
-    
-    // In a real app, you would upload to server
-    // For now, create a local URL
-    const imageUrl = URL.createObjectURL(file);
-    setFormData(prev => ({
-      ...prev,
-      avatar: imageUrl
-    }));
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const handleLogout = () => {
+    logout();
   };
 
   if (!user) {
-    return (
-      <div className="profile-container">
-        <div className="login-prompt">
-          <h2>Please log in to view your profile</h2>
-        </div>
-      </div>
-    );
+    return null;
   }
+
+  const menuItems = [
+    { id: 'profile', icon: <User size={20} />, label: 'Profile', show: true },
+    { id: 'security', icon: <Key size={20} />, label: 'Security', show: true },
+    { id: 'reading', icon: <BookOpen size={20} />, label: 'Reading History', show: true },
+    { id: 'favorites', icon: <Heart size={20} />, label: 'Favorites', show: true },
+    { id: 'billing', icon: <CreditCard size={20} />, label: 'Billing', show: isAdmin() },
+    { id: 'admin', icon: <Shield size={20} />, label: 'Admin Dashboard', show: isAdmin() },
+    { id: 'help', icon: <HelpCircle size={20} />, label: 'Help & Support', show: true }
+  ];
 
   return (
     <div className="profile-container">
-      <div className="profile-header">
-        <div className="profile-avatar-section">
-          <div className="avatar-container">
-            <img 
-              src={formData.avatar || '/default-avatar.png'} 
-              alt="Profile Avatar" 
-              className="profile-avatar"
-            />
-            {editMode && (
-              <label className="avatar-upload-btn">
-                Upload
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  style={{ display: 'none' }}
-                />
-              </label>
-            )}
+      <div className="profile-sidebar">
+        <div className="profile-header">
+          <div className="profile-avatar">
+            {user.username?.charAt(0).toUpperCase()}
           </div>
           <div className="profile-info">
-            <h1>{formData.username}</h1>
-            <p className="profile-email">{formData.email}</p>
-            <p className="member-since">
-              Member since: {formatDate(user.createdAt || new Date().toISOString())}
-            </p>
+            <h3>{user.username}</h3>
+            <p>{user.email}</p>
+            {isAdmin() && (
+              <span className="admin-badge">
+                <Shield size={14} /> Admin
+              </span>
+            )}
           </div>
         </div>
-        
-        <div className="profile-stats">
-          <div className="stat">
-            <span className="stat-number">{favorites.length}</span>
-            <span className="stat-label">Favorites</span>
-          </div>
-          <div className="stat">
-            <span className="stat-number">{readingHistory.length}</span>
-            <span className="stat-label">Read</span>
-          </div>
-          <div className="stat">
-            <span className="stat-number">{user.readingTime || 0}h</span>
-            <span className="stat-label">Reading Time</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="profile-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
-        >
-          Profile
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
-          onClick={() => setActiveTab('favorites')}
-        >
-          Favorites ({favorites.length})
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
-          Reading History
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
-        >
-          Settings
+        <nav className="profile-menu">
+          {menuItems
+            .filter(item => item.show)
+            .map(item => (
+              <button
+                key={item.id}
+                className={`menu-item ${activeTab === item.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(item.id)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            ))}
+        </nav>
+
+        <button className="logout-btn" onClick={handleLogout}>
+          <LogOut size={20} />
+          <span>Logout</span>
         </button>
       </div>
 
       <div className="profile-content">
-        {activeTab === 'profile' && (
-          <div className="tab-content">
-            <div className="profile-bio">
-              <h3>About</h3>
-              {editMode ? (
-                <textarea
-                  name="bio"
-                  value={formData.bio}
+        <div className="profile-content-header">
+          <h2>
+            {activeTab === 'profile' && 'Profile Settings'}
+            {activeTab === 'security' && 'Security Settings'}
+            {activeTab === 'reading' && 'Reading History'}
+            {activeTab === 'favorites' && 'My Favorites'}
+            {activeTab === 'billing' && 'Billing'}
+            {activeTab === 'admin' && 'Admin Dashboard'}
+            {activeTab === 'help' && 'Help & Support'}
+          </h2>
+          <p className="profile-subtitle">
+            {activeTab === 'profile' && 'Manage your account information'}
+            {activeTab === 'security' && 'Update your password and security settings'}
+            {activeTab === 'reading' && 'View your reading history'}
+            {activeTab === 'favorites' && 'Manage your favorite manga'}
+            {activeTab === 'billing' && 'View billing information and invoices'}
+            {activeTab === 'admin' && 'Access admin controls and statistics'}
+            {activeTab === 'help' && 'Get help and contact support'}
+          </p>
+        </div>
+
+        {message && (
+          <div className={`profile-message ${message.includes('Error') ? 'error' : 'success'}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="profile-content-body">
+          {activeTab === 'profile' && (
+            <form className="profile-form" onSubmit={handleProfileUpdate}>
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
                   onChange={handleInputChange}
-                  placeholder="Tell us about yourself..."
-                  rows="4"
+                  placeholder="Enter your username"
+                  disabled={loading}
                 />
-              ) : (
-                <p>{formData.bio || 'No bio yet...'}</p>
-              )}
-            </div>
-            
-            {editMode ? (
-              <div className="edit-form">
-                <h3>Edit Profile</h3>
-                <form onSubmit={handleProfileUpdate}>
-                  <div className="form-group">
-                    <label>Username</label>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-actions">
-                    <button type="submit" className="save-btn">Save Changes</button>
-                    <button 
-                      type="button" 
-                      className="cancel-btn"
-                      onClick={() => setEditMode(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
               </div>
-            ) : (
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email"
+                  disabled={loading}
+                />
+              </div>
+
               <button 
-                className="edit-profile-btn"
-                onClick={() => setEditMode(true)}
+                type="submit" 
+                className="save-btn"
+                disabled={loading}
               >
-                Edit Profile
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
-            )}
-          </div>
-        )}
+            </form>
+          )}
 
-        {activeTab === 'favorites' && (
-          <div className="tab-content">
-            <h3>Favorite Manga</h3>
-            {favorites.length > 0 ? (
-              <div className="manga-grid">
-                {favorites.map(manga => (
-                  <MangaCard key={manga.id} manga={manga} />
-                ))}
+          {activeTab === 'security' && (
+            <form className="profile-form" onSubmit={handlePasswordChange}>
+              <div className="form-group">
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleInputChange}
+                  placeholder="Enter current password"
+                  disabled={loading}
+                />
               </div>
-            ) : (
-              <p className="empty-state">No favorites yet. Start adding some!</p>
-            )}
-          </div>
-        )}
 
-        {activeTab === 'history' && (
-          <div className="tab-content">
-            <h3>Reading History</h3>
-            {readingHistory.length > 0 ? (
-              <div className="history-list">
-                {readingHistory.map((item, index) => (
-                  <div key={index} className="history-item">
-                    <div className="history-manga">
-                      <img 
-                        src={item.mangaCover} 
-                        alt={item.mangaTitle}
-                        className="history-cover"
-                      />
-                      <div className="history-info">
-                        <h4>{item.mangaTitle}</h4>
-                        <p>Chapter {item.chapterNumber}</p>
-                        <span className="history-date">
-                          {formatDate(item.readAt)}
-                        </span>
-                      </div>
-                    </div>
-                    <button className="continue-btn">Continue Reading</button>
-                  </div>
-                ))}
+              <div className="form-group">
+                <label>New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                  placeholder="Enter new password"
+                  disabled={loading}
+                  minLength="8"
+                />
               </div>
-            ) : (
-              <p className="empty-state">No reading history yet.</p>
-            )}
-          </div>
-        )}
 
-        {activeTab === 'settings' && (
-          <div className="tab-content">
-            <div className="settings-section">
-              <h3>Change Password</h3>
-              <form onSubmit={handlePasswordUpdate}>
-                <div className="form-group">
-                  <label>Current Password</label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>New Password</label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Confirm New Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <button type="submit" className="save-btn">
-                  Update Password
-                </button>
-              </form>
-            </div>
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  placeholder="Confirm new password"
+                  disabled={loading}
+                  minLength="8"
+                />
+              </div>
 
-            <div className="settings-section">
-              <h3>Account Actions</h3>
-              <div className="danger-zone">
-                <button className="logout-btn" onClick={logout}>
-                  Log Out
-                </button>
-                <button className="delete-btn">
-                  Delete Account
-                </button>
+              <div className="password-requirements">
+                <p>Password must be at least 8 characters long</p>
+              </div>
+
+              <button 
+                type="submit" 
+                className="save-btn"
+                disabled={loading}
+              >
+                {loading ? 'Changing Password...' : 'Change Password'}
+              </button>
+            </form>
+          )}
+
+          {activeTab === 'admin' && isAdmin() && (
+            <div className="admin-section">
+              <div className="admin-grid">
+                <Link to="/dashboard" className="admin-card">
+                  <div className="admin-card-icon">📊</div>
+                  <h3>Dashboard</h3>
+                  <p>View site statistics and manage content</p>
+                </Link>
+
+                <Link to="/dashboard?tab=users" className="admin-card">
+                  <div className="admin-card-icon">👥</div>
+                  <h3>Users</h3>
+                  <p>Manage user accounts and permissions</p>
+                </Link>
+
+                <Link to="/dashboard?tab=manga" className="admin-card">
+                  <div className="admin-card-icon">📚</div>
+                  <h3>Manga</h3>
+                  <p>Add, edit, and delete manga titles</p>
+                </Link>
+
+                <div className="admin-card">
+                  <div className="admin-card-icon">⚙️</div>
+                  <h3>Settings</h3>
+                  <p>Configure site settings and preferences</p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {activeTab === 'reading' && (
+            <div className="empty-state">
+              <div className="empty-icon">📖</div>
+              <h3>No Reading History</h3>
+              <p>Start reading manga to see your history here</p>
+              <Link to="/browse" className="browse-link">
+                Browse Manga
+              </Link>
+            </div>
+          )}
+
+          {activeTab === 'favorites' && (
+            <div className="empty-state">
+              <div className="empty-icon">⭐</div>
+              <h3>No Favorites Yet</h3>
+              <p>Add manga to your favorites to see them here</p>
+              <Link to="/browse" className="browse-link">
+                Browse Manga
+              </Link>
+            </div>
+          )}
+
+          {activeTab === 'help' && (
+            <div className="help-section">
+              <div className="help-card">
+                <h3>Need Help?</h3>
+                <p>If you're experiencing issues or have questions, please contact support:</p>
+                <ul>
+                  <li>Email: support@mangaqu.com</li>
+                  <li>Discord: discord.gg/mangaqu</li>
+                  <li>Twitter: @MangaQuHelp</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default Profile;

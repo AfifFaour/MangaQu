@@ -1,50 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import MangaGrid from '../Components/manga/MangaGrid';
-import { Heart } from 'lucide-react';
-import { userAPI } from '../services/Api';
-import '../styles/Pages.css';
+// src/pages/Favorite.js
+import React, { useEffect, useState } from "react";
+import MangaGrid from "../Components/manga/MangaGrid";
+import { Heart } from "lucide-react";
+import api from "../services/Api";
+import { useAuth } from "../context/AuthContext";
+import "../styles/Pages.css";
 
 const Favorite = () => {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [error, setError] = useState(null);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [error, setError] = useState("");
+
+  const { getToken, isAuthenticated } = useAuth();
 
   useEffect(() => {
+    let alive = true;
+
     const fetchFavorites = async () => {
       try {
         setLoading(true);
+        setError("");
 
-        const res = await userAPI.getFavorites();
-        setMangas(res.data);
+        if (!isAuthenticated()) {
+          setAuthRequired(true);
+          setMangas([]);
+          return;
+        }
+
+        const token = getToken();
+        if (!token) {
+          setAuthRequired(true);
+          setMangas([]);
+          return;
+        }
+
+        const res = await api.get("/user/favorites", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!alive) return;
+
+        setAuthRequired(false);
+        setMangas(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        if (err.response?.status === 401) {
-          setIsAuthenticated(false);
+        if (!alive) return;
+
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          setAuthRequired(true);
+          setMangas([]);
         } else {
-          setError('Failed to load favorites');
+          setError(err.response?.data?.error || "Failed to load favorites");
+          setMangas([]);
         }
       } finally {
+        if (!alive) return;
         setLoading(false);
       }
     };
 
     fetchFavorites();
-  }, []);
 
-  /* =========================
-     AUTH REQUIRED STATE
-     ========================= */
-  if (!isAuthenticated) {
+    return () => {
+      alive = false;
+    };
+  }, [getToken, isAuthenticated]);
+
+  // =========================
+  // AUTH REQUIRED UI
+  // =========================
+  if (authRequired) {
     return (
       <div className="browse-page">
         <div className="auth-required">
           <Heart size={64} className="auth-icon" />
           <h2>Sign in to view favorites</h2>
           <p>Please log in to see your favorite manga collection</p>
-          <button
-            className="auth-button"
-            onClick={() => (window.location.href = '/login')}
-          >
+          <button className="auth-button" onClick={() => (window.location.href = "/login")}>
             Sign In
           </button>
         </div>
@@ -52,13 +84,18 @@ const Favorite = () => {
     );
   }
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  if (error) return <div className="error">{error}</div>;
 
-  /* =========================
-     MAIN RENDER
-     ========================= */
+  const lastAdded =
+    mangas.length > 0
+      ? new Date(
+          Math.max(...mangas.map((m) => new Date(m.favorited_at || m.created_at || Date.now()).getTime()))
+        ).toLocaleDateString()
+      : null;
+
+  // =========================
+  // MAIN RENDER
+  // =========================
   return (
     <div className="browse-page">
       <div className="browse-header">
@@ -73,15 +110,9 @@ const Favorite = () => {
         {mangas.length > 0 && (
           <div className="favorites-stats">
             <span>
-              {mangas.length}{' '}
-              {mangas.length === 1 ? 'manga' : 'mangas'} saved
+              {mangas.length} {mangas.length === 1 ? "manga" : "mangas"} saved
             </span>
-            <span className="last-added">
-              Last added:{' '}
-              {new Date(
-                Math.max(...mangas.map(m => new Date(m.favoritedDate)))
-              ).toLocaleDateString()}
-            </span>
+            {lastAdded && <span className="last-added">Last added: {lastAdded}</span>}
           </div>
         )}
       </div>
@@ -91,20 +122,12 @@ const Favorite = () => {
           <Heart size={48} className="empty-icon" />
           <h2>No favorites yet</h2>
           <p>Start adding manga to your favorites to see them here</p>
-          <button
-            className="browse-button"
-            onClick={() => (window.location.href = '/browse')}
-          >
+          <button className="browse-button" onClick={() => (window.location.href = "/browse")}>
             Browse Manga
           </button>
         </div>
       ) : (
-        <MangaGrid
-          mangas={mangas}
-          title="My Favorites"
-          loading={loading}
-          showFilters={true}
-        />
+        <MangaGrid mangas={mangas} title="My Favorites" loading={loading} showFilters />
       )}
     </div>
   );

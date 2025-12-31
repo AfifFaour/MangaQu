@@ -1,44 +1,54 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, Eye, Clock, Download, ChevronDown, ChevronUp } from 'lucide-react';
-import { getChaptersByMangaId } from '../../pages/ChapterData';
-import '../../styles/ChapterList.css';
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { Calendar, Eye, Clock, Download, ChevronDown, ChevronUp } from "lucide-react";
+import "../../styles/ChapterList.css";
 
-const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [filterUploader, setFilterUploader] = useState('all');
+const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapterSelect }) => {
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [filterUploader, setFilterUploader] = useState("all");
   const [expandedChapter, setExpandedChapter] = useState(null);
-  const chapters = getChaptersByMangaId(mangaId);
-  const sortedChapters = [...chapters].sort((a, b) => {
-    return sortOrder === 'desc' ? b.number - a.number : a.number - b.number;
-  });
 
-  const filteredChapters = filterUploader === 'all' 
-    ? sortedChapters : sortedChapters.filter(chapter => chapter.uploader === filterUploader);
+  // ✅ Always force chapters into an array
+  const chapters = Array.isArray(chaptersProp) ? chaptersProp : [];
+
+  const sortedChapters = useMemo(() => {
+    const copy = [...chapters];
+    copy.sort((a, b) => {
+      const aNum = Number(a.number ?? a.chapter_number ?? 0);
+      const bNum = Number(b.number ?? b.chapter_number ?? 0);
+      return sortOrder === "desc" ? bNum - aNum : aNum - bNum;
+    });
+    return copy;
+  }, [chapters, sortOrder]);
+
+  const uploaders = useMemo(() => {
+    return [...new Set(chapters.map((c) => c.uploader).filter(Boolean))];
+  }, [chapters]);
+
+  const filteredChapters =
+    filterUploader === "all"
+      ? sortedChapters
+      : sortedChapters.filter((chapter) => chapter.uploader === filterUploader);
 
   const toggleSortOrder = () => {
-    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
+    setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
   };
 
   const toggleChapterExpand = (chapterId) => {
-    setExpandedChapter(expandedChapter === chapterId ? null : chapterId);
+    setExpandedChapter((prev) => (prev === chapterId ? null : chapterId));
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return 'Yesterday';
+    if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     return date.toLocaleDateString();
-  };
-
-  const getUploaders = () => {
-    const uploaders = [...new Set(chapters.map(chap => chap.uploader))];
-    return uploaders.filter(uploader => uploader);
   };
 
   const handleChapterClick = (chapter, e) => {
@@ -50,35 +60,33 @@ const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
 
   const getReadingTime = (chapterNumber) => {
     const baseTime = 5;
-    const additionalTime = Math.floor(chapterNumber / 10);
+    const additionalTime = Math.floor(Number(chapterNumber || 0) / 10);
     return `${baseTime + additionalTime} min read`;
   };
 
   return (
     <div className="chapter-list">
       <div className="chapter-list-header">
-        <h3 className="chapter-list-title">
-          Chapters ({chapters.length})
-        </h3>
-        
+        <h3 className="chapter-list-title">Chapters ({chapters.length})</h3>
+
         <div className="chapter-controls">
-          <button 
+          <button
             className="sort-btn"
             onClick={toggleSortOrder}
-            title={`Sort ${sortOrder === 'desc' ? 'Ascending' : 'Descending'}`}
+            title={`Sort ${sortOrder === "desc" ? "Ascending" : "Descending"}`}
           >
-            {sortOrder === 'desc' ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-            {sortOrder === 'desc' ? 'Newest First' : 'Oldest First'}
+            {sortOrder === "desc" ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            {sortOrder === "desc" ? "Newest First" : "Oldest First"}
           </button>
 
-          {getUploaders().length > 1 && (
-            <select 
+          {uploaders.length > 1 && (
+            <select
               className="uploader-filter"
               value={filterUploader}
               onChange={(e) => setFilterUploader(e.target.value)}
             >
               <option value="all">All Uploaders</option>
-              {getUploaders().map(uploader => (
+              {uploaders.map((uploader) => (
                 <option key={uploader} value={uploader}>
                   {uploader}
                 </option>
@@ -90,32 +98,21 @@ const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
 
       <div className="chapters-container">
         {filteredChapters.length === 0 ? (
-          <div className="no-chapters">
-            No chapters available
-          </div>
+          <div className="no-chapters">No chapters available</div>
         ) : (
           <div className="chapters">
             {filteredChapters.map((chapter, index) => (
-              <div 
-                key={chapter.id} 
-                className={`chapter-item ${index === 0 ? 'latest' : ''}`}
-              >
+              <div key={chapter.id} className={`chapter-item ${index === 0 ? "latest" : ""}`}>
                 <div className="chapter-main">
-                  <Link 
+                  <Link
                     to={`/read/${mangaId}/${chapter.id}`}
                     className="chapter-link"
                     state={{ mangaTitle, chapterTitle: chapter.title }}
                     onClick={(e) => handleChapterClick(chapter, e)}
                   >
                     <div className="chapter-info">
-                      <span className="chapter-number">
-                        Chapter {chapter.number}
-                      </span>
-                      {chapter.title && (
-                        <span className="chapter-title">
-                          : {chapter.title}
-                        </span>
-                      )}
+                      <span className="chapter-number">Chapter {chapter.number}</span>
+                      {chapter.title && <span className="chapter-title">: {chapter.title}</span>}
                     </div>
                   </Link>
 
@@ -126,11 +123,12 @@ const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
                         <span>{formatDate(chapter.date)}</span>
                       </div>
                     )}
-                    
-                    {chapter.views && (
+
+                    {/* show views even if 0 */}
+                    {chapter.views !== undefined && chapter.views !== null && (
                       <div className="meta-item">
                         <Eye size={14} className="meta-icon" />
-                        <span>{chapter.views.toLocaleString()}</span>
+                        <span>{Number(chapter.views).toLocaleString()}</span>
                       </div>
                     )}
 
@@ -149,7 +147,7 @@ const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
 
                 <div className="chapter-actions">
                   {chapter.downloadUrl && (
-                    <a 
+                    <a
                       href={chapter.downloadUrl}
                       className="action-btn download-btn"
                       download
@@ -158,21 +156,16 @@ const ChapterList = ({ mangaId, mangaTitle, onChapterSelect }) => {
                       <Download size={16} />
                     </a>
                   )}
-                  
+
                   {chapter.description && (
-                    <button 
-                      className="action-btn expand-btn"
-                      onClick={() => toggleChapterExpand(chapter.id)}
-                    >
+                    <button className="action-btn expand-btn" onClick={() => toggleChapterExpand(chapter.id)}>
                       {expandedChapter === chapter.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                   )}
                 </div>
 
                 {expandedChapter === chapter.id && chapter.description && (
-                  <div className="chapter-description">
-                    {chapter.description}
-                  </div>
+                  <div className="chapter-description">{chapter.description}</div>
                 )}
               </div>
             ))}
