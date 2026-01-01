@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
@@ -113,7 +112,7 @@ function findChapterFolder({ slug, chapterNumber }) {
 
   const targets = new Set([
     `chapter-${chapNum}`,
-    `chapter${chapNum}`, // chapter1
+    `chapter${chapNum}`, 
   ]);
 
   const match = entries.find((e) => {
@@ -156,7 +155,6 @@ function buildChapterPagesFromDisk({ slug, chapterNumber }) {
  * This fixes: DB has 3 pages but folder has 42 => you should show 42.
  */
 function resolveChapterPages({ rowPages, slug, chapterNumber }) {
-  // DB pages
   let dbPages = safeJsonParse(rowPages, []);
   if (Array.isArray(dbPages)) {
     dbPages = dbPages
@@ -169,7 +167,7 @@ function resolveChapterPages({ rowPages, slug, chapterNumber }) {
   // Disk pages
   const diskPages = buildChapterPagesFromDisk({ slug, chapterNumber });
 
-  // ✅ Use disk if it has more pages than DB
+  // Use disk if it has more pages than DB
   if (diskPages.length > dbPages.length) return diskPages;
 
   return dbPages;
@@ -405,7 +403,7 @@ app.delete("/api/manga/:id", authenticateToken, authorizeAdmin, (req, res) => {
  * GET /api/manga/:id/chapters
  * - parses pages JSON
  * - scans disk too
- * - ✅ prefers disk pages if disk has more images than DB pages
+ * - prefers disk pages if disk has more images than DB pages
  */
 app.get("/api/manga/:id/chapters", (req, res) => {
   const mangaId = req.params.id;
@@ -444,7 +442,7 @@ app.get("/api/manga/:id/chapters", (req, res) => {
 /**
  * GET /api/chapters/:chapterId/pages
  * Returns: [{ imageUrl }]
- * ✅ prefers disk pages if disk has more images than DB pages
+ * prefers disk pages if disk has more images than DB pages
  */
 app.get("/api/chapters/:chapterId/pages", (req, res) => {
   const chapterId = req.params.chapterId;
