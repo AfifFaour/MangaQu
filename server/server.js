@@ -8,9 +8,9 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-/* ============================================================================
+/* =========================
    CONFIG
-============================================================================ */
+========================= */
 const PORT = 5001;
 const CLIENT_ORIGIN = "http://localhost:3000";
 const API_ORIGIN = `http://localhost:${PORT}`;
@@ -24,9 +24,9 @@ const db = mysql.createConnection({
   charset: "utf8mb4",
 });
 
-/* ============================================================================
+/* =========================
    MIDDLEWARE
-============================================================================ */
+========================= */
 app.use(
   cors({
     origin: CLIENT_ORIGIN,
@@ -35,7 +35,7 @@ app.use(
 );
 app.use(express.json());
 
-// Serve assets + allow React to load images
+// Serve assets (images)
 app.use("/Assets", (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", CLIENT_ORIGIN);
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
@@ -43,9 +43,9 @@ app.use("/Assets", (req, res, next) => {
 });
 app.use("/Assets", express.static(path.join(__dirname, "Assets")));
 
-/* ============================================================================
+/* =========================
    DB CONNECT
-============================================================================ */
+========================= */
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed:", err.message);
@@ -54,9 +54,9 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-/* ============================================================================
+/* =========================
    HELPERS
-============================================================================ */
+========================= */
 function safeJsonParse(val, fallback) {
   try {
     return JSON.parse(val);
@@ -79,30 +79,56 @@ function ensureLeadingSlash(p) {
   return p.startsWith("/") ? p : `/${p}`;
 }
 
-/**
- * Extract last number in filename to sort properly:
- *   "Attack on Titan-000.jpg" -> 0
- *   "Attack on Titan-015.jpg" -> 15
- */
-function extractTrailingNumber(filename) {
-  const name = path.parse(filename).name;
-  const match = name.match(/(\d+)(?!.*\d)/);
-  return match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
+// normalize folder names to match even if spaces/case/underscore differ
+function normalizeName(s) {
+  return String(s || "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/_/g, "-");
+}
+
+// convert "01" -> "1", "001" -> "1"
+function stripLeadingZeros(n) {
+  const x = String(n ?? "").trim();
+  return x.replace(/^0+/, "") || "0";
 }
 
 /**
- * Find chapter folder robustly inside:
- *   server/Assets/Manga/<slug>/
+ * Find Manga folder:
+ * server/Assets/Manga/<slug>
+ * If slug folder doesn't exist, match by normalized folder name.
+ */
+function findMangaFolder(slug) {
+  const mangaRoot = path.join(__dirname, "Assets", "Manga");
+  if (!fs.existsSync(mangaRoot)) return null;
+
+  const direct = path.join(mangaRoot, slug);
+  if (fs.existsSync(direct)) return direct;
+
+  const target = normalizeName(slug);
+  const dirs = fs
+    .readdirSync(mangaRoot, { withFileTypes: true })
+    .filter((d) => d.isDirectory());
+
+  const match = dirs.find((d) => normalizeName(d.name) === target);
+  return match ? path.join(mangaRoot, match.name) : null;
+}
+
+/**
+ * Find chapter folder robustly:
  * supports:
- *   chapter-1, Chapter-1, chapter_1, chapter 1, CHAPTER-1, chapter1
+ * chapter-1, chapter1, chapter-01, chapter01, chapter-001...
+ * Chapter 1, Chapter 01, Chapter_1, CHAPTER-1...
+ * ch-1, ch01, c-1
  */
 function findChapterFolder({ slug, chapterNumber }) {
-  const baseDir = path.join(__dirname, "Assets", "Manga", slug);
-  if (!fs.existsSync(baseDir)) return null;
+  const mangaFolder = findMangaFolder(slug);
+  if (!mangaFolder) return null;
 
-  const chapNum = String(parseInt(Number(chapterNumber), 10));
-  const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+  const chap = stripLeadingZeros(chapterNumber);
 
+<<<<<<< HEAD
   const normalize = (s) =>
     String(s || "")
       .toLowerCase()
@@ -113,21 +139,36 @@ function findChapterFolder({ slug, chapterNumber }) {
   const targets = new Set([
     `chapter-${chapNum}`,
     `chapter${chapNum}`, 
+=======
+  const candidates = new Set([
+    `chapter-${chap}`,
+    `chapter${chap}`,
+    `chapter-0${chap}`,
+    `chapter0${chap}`,
+    `chapter-00${chap}`,
+    `chapter00${chap}`,
+    `chapter-000${chap}`,
+    `chapter000${chap}`,
+    `ch-${chap}`,
+    `ch${chap}`,
+    `ch-0${chap}`,
+    `ch0${chap}`,
+    `c-${chap}`,
+    `c${chap}`,
+>>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
   ]);
 
-  const match = entries.find((e) => {
-    if (!e.isDirectory()) return false;
-    return targets.has(normalize(e.name));
-  });
+  const entries = fs
+    .readdirSync(mangaFolder, { withFileTypes: true })
+    .filter((e) => e.isDirectory());
 
-  return match ? path.join(baseDir, match.name) : null;
+  const match = entries.find((e) => candidates.has(normalizeName(e.name)));
+  return match ? path.join(mangaFolder, match.name) : null;
 }
 
 /**
- * Build pages by scanning disk:
- *   server/Assets/Manga/<slug>/<chapter-folder>/
- * Return:
- *   /Assets/Manga/<slug>/<chapter-folder>/<file>
+ * Scan disk and return URLs:
+ * /Assets/Manga/<real-manga-folder>/<real-chapter-folder>/<file>
  */
 function buildChapterPagesFromDisk({ slug, chapterNumber }) {
   if (!slug) return [];
@@ -136,23 +177,18 @@ function buildChapterPagesFromDisk({ slug, chapterNumber }) {
   if (!folderPath) return [];
 
   const chapterFolderName = path.basename(folderPath);
+  const mangaFolderName = path.basename(path.dirname(folderPath)); // real manga folder name
 
   const files = fs
     .readdirSync(folderPath)
     .filter((f) => /\.(jpg|jpeg|png|webp)$/i.test(f))
-    .sort((a, b) => {
-      const na = extractTrailingNumber(a);
-      const nb = extractTrailingNumber(b);
-      if (na !== nb) return na - nb;
-      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-    });
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
-  return files.map((file) => `/Assets/Manga/${slug}/${chapterFolderName}/${file}`);
+  return files.map((file) => `/Assets/Manga/${mangaFolderName}/${chapterFolderName}/${file}`);
 }
 
 /**
- * Prefer disk pages if it has more images than DB pages.
- * This fixes: DB has 3 pages but folder has 42 => you should show 42.
+ * Prefer disk pages when disk has more images than DB pages.
  */
 function resolveChapterPages({ rowPages, slug, chapterNumber }) {
   let dbPages = safeJsonParse(rowPages, []);
@@ -164,18 +200,19 @@ function resolveChapterPages({ rowPages, slug, chapterNumber }) {
     dbPages = [];
   }
 
-  // Disk pages
   const diskPages = buildChapterPagesFromDisk({ slug, chapterNumber });
 
+<<<<<<< HEAD
   // Use disk if it has more pages than DB
+=======
+>>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
   if (diskPages.length > dbPages.length) return diskPages;
-
   return dbPages;
 }
 
-/* ============================================================================
+/* =========================
    AUTH MIDDLEWARES
-============================================================================ */
+========================= */
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -195,9 +232,9 @@ function authorizeAdmin(req, res, next) {
   next();
 }
 
-/* ============================================================================
+/* =========================
    ROUTES: AUTH
-============================================================================ */
+========================= */
 app.post("/api/auth/register", async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
@@ -270,12 +307,9 @@ app.post("/api/auth/verify", authenticateToken, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
 
-/* ============================================================================
+/* =========================
    ROUTES: MANGA
-============================================================================ */
-/**
- * GET /api/manga?sort=updated|newest|popular|rating&type=all|manga|...&search=...
- */
+========================= */
 app.get("/api/manga", (req, res) => {
   const sort = String(req.query.sort || "updated").toLowerCase();
   const type = String(req.query.type || "all").toLowerCase();
@@ -377,7 +411,17 @@ app.put("/api/manga/:id", authenticateToken, authorizeAdmin, (req, res) => {
 
   db.query(
     sql,
-    [title, finalSlug, cover_image, status, type || "manga", description || "", views || 0, rating || 0.0, mangaId],
+    [
+      title,
+      finalSlug,
+      cover_image,
+      status,
+      type || "manga",
+      description || "",
+      views || 0,
+      rating || 0.0,
+      mangaId,
+    ],
     (err, result) => {
       if (err) return res.status(500).json({ error: "Database error" });
       if (!result.affectedRows) return res.status(404).json({ error: "Manga not found" });
@@ -396,8 +440,9 @@ app.delete("/api/manga/:id", authenticateToken, authorizeAdmin, (req, res) => {
   });
 });
 
-/* ============================================================================
+/* =========================
    ROUTES: CHAPTERS
+<<<<<<< HEAD
 ============================================================================ */
 /**
  * GET /api/manga/:id/chapters
@@ -405,6 +450,9 @@ app.delete("/api/manga/:id", authenticateToken, authorizeAdmin, (req, res) => {
  * - scans disk too
  * - prefers disk pages if disk has more images than DB pages
  */
+=======
+========================= */
+>>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
 app.get("/api/manga/:id/chapters", (req, res) => {
   const mangaId = req.params.id;
 
@@ -430,7 +478,6 @@ app.get("/api/manga/:id/chapters", (req, res) => {
           slug,
           chapterNumber: r.chapter_number,
         });
-
         return { ...r, pages };
       });
 
@@ -439,11 +486,14 @@ app.get("/api/manga/:id/chapters", (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 /**
  * GET /api/chapters/:chapterId/pages
  * Returns: [{ imageUrl }]
  * prefers disk pages if disk has more images than DB pages
  */
+=======
+>>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
 app.get("/api/chapters/:chapterId/pages", (req, res) => {
   const chapterId = req.params.chapterId;
 
@@ -467,6 +517,9 @@ app.get("/api/chapters/:chapterId/pages", (req, res) => {
       slug,
       chapterNumber: row.chapter_number,
     });
+
+    // optional debug
+    // console.log("slug:", slug, "chapter:", row.chapter_number, "pages:", pages.length);
 
     res.json(pages.map((p) => ({ imageUrl: `${API_ORIGIN}${p}` })));
   });
@@ -513,7 +566,13 @@ app.put("/api/chapters/:chapterId", authenticateToken, authorizeAdmin, (req, res
 
   db.query(
     sql,
-    [chapter_number, title || null, JSON.stringify(Array.isArray(pages) ? pages : []), view_count || 0, chapterId],
+    [
+      chapter_number,
+      title || null,
+      JSON.stringify(Array.isArray(pages) ? pages : []),
+      view_count || 0,
+      chapterId,
+    ],
     (err, result) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {
@@ -537,9 +596,9 @@ app.delete("/api/chapters/:chapterId", authenticateToken, authorizeAdmin, (req, 
   });
 });
 
-/* ============================================================================
+/* =========================
    ROUTES: FAVORITES
-============================================================================ */
+========================= */
 app.get("/api/user/favorites", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -581,16 +640,16 @@ app.delete("/api/user/favorites/:mangaId", authenticateToken, (req, res) => {
   });
 });
 
-/* ============================================================================
+/* =========================
    ROOT
-============================================================================ */
+========================= */
 app.get("/", (req, res) => {
   res.json({ message: "MangaQu API Server", ok: true });
 });
 
-/* ============================================================================
+/* =========================
    START
-============================================================================ */
+========================= */
 app.listen(PORT, () => {
   console.log(`Server running on ${API_ORIGIN}`);
 });
