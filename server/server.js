@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
@@ -128,18 +129,6 @@ function findChapterFolder({ slug, chapterNumber }) {
 
   const chap = stripLeadingZeros(chapterNumber);
 
-<<<<<<< HEAD
-  const normalize = (s) =>
-    String(s || "")
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "")
-      .replace(/_/g, "-");
-
-  const targets = new Set([
-    `chapter-${chapNum}`,
-    `chapter${chapNum}`, 
-=======
   const candidates = new Set([
     `chapter-${chap}`,
     `chapter${chap}`,
@@ -155,7 +144,6 @@ function findChapterFolder({ slug, chapterNumber }) {
     `ch0${chap}`,
     `c-${chap}`,
     `c${chap}`,
->>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
   ]);
 
   const entries = fs
@@ -202,10 +190,6 @@ function resolveChapterPages({ rowPages, slug, chapterNumber }) {
 
   const diskPages = buildChapterPagesFromDisk({ slug, chapterNumber });
 
-<<<<<<< HEAD
-  // Use disk if it has more pages than DB
-=======
->>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
   if (diskPages.length > dbPages.length) return diskPages;
   return dbPages;
 }
@@ -442,17 +426,7 @@ app.delete("/api/manga/:id", authenticateToken, authorizeAdmin, (req, res) => {
 
 /* =========================
    ROUTES: CHAPTERS
-<<<<<<< HEAD
-============================================================================ */
-/**
- * GET /api/manga/:id/chapters
- * - parses pages JSON
- * - scans disk too
- * - prefers disk pages if disk has more images than DB pages
- */
-=======
 ========================= */
->>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
 app.get("/api/manga/:id/chapters", (req, res) => {
   const mangaId = req.params.id;
 
@@ -486,14 +460,6 @@ app.get("/api/manga/:id/chapters", (req, res) => {
   });
 });
 
-<<<<<<< HEAD
-/**
- * GET /api/chapters/:chapterId/pages
- * Returns: [{ imageUrl }]
- * prefers disk pages if disk has more images than DB pages
- */
-=======
->>>>>>> d7c7406 (Phase 4 minor fix : backend fixes)
 app.get("/api/chapters/:chapterId/pages", (req, res) => {
   const chapterId = req.params.chapterId;
 
