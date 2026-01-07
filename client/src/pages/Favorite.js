@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import MangaGrid from "../Components/manga/MangaGrid";
 import { Heart } from "lucide-react";
 import api from "../services/Api";
-import { useAuth } from "../context/AuthContext";
 import "../styles/Pages.css";
 
 const Favorite = () => {
@@ -11,8 +10,6 @@ const Favorite = () => {
   const [loading, setLoading] = useState(true);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState("");
-
-  const { getToken, isAuthenticated } = useAuth();
 
   useEffect(() => {
     let alive = true;
@@ -22,22 +19,8 @@ const Favorite = () => {
         setLoading(true);
         setError("");
 
-        if (!isAuthenticated()) {
-          setAuthRequired(true);
-          setMangas([]);
-          return;
-        }
-
-        const token = getToken();
-        if (!token) {
-          setAuthRequired(true);
-          setMangas([]);
-          return;
-        }
-
-        const res = await api.get("/user/favorites", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // ✅ Just call API. If token missing/invalid backend will return 401/403.
+        const res = await api.get("/user/favorites");
 
         if (!alive) return;
 
@@ -46,12 +29,16 @@ const Favorite = () => {
       } catch (err) {
         if (!alive) return;
 
-        if (err.response?.status === 401 || err.response?.status === 403) {
+        const status = err?.response?.status;
+
+        if (status === 401 || status === 403) {
           setAuthRequired(true);
           setMangas([]);
+          setError("");
         } else {
-          setError(err.response?.data?.error || "Failed to load favorites");
+          setAuthRequired(false);
           setMangas([]);
+          setError(err?.response?.data?.error || "Failed to load favorites");
         }
       } finally {
         if (!alive) return;
@@ -64,7 +51,7 @@ const Favorite = () => {
     return () => {
       alive = false;
     };
-  }, [getToken, isAuthenticated]);
+  }, []);
 
   // =========================
   // AUTH REQUIRED UI
@@ -89,7 +76,11 @@ const Favorite = () => {
   const lastAdded =
     mangas.length > 0
       ? new Date(
-          Math.max(...mangas.map((m) => new Date(m.favorited_at || m.created_at || Date.now()).getTime()))
+          Math.max(
+            ...mangas.map((m) =>
+              new Date(m.favorited_at || m.created_at || Date.now()).getTime()
+            )
+          )
         ).toLocaleDateString()
       : null;
 

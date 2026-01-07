@@ -48,11 +48,6 @@ const Browse = () => {
 
   return (
     <div className="browse-page">
-      <div className="browse-header">
-        <h1>Browse All Manga</h1>
-        <p>Discover manga from your library</p>
-      </div>
-
       <MangaGrid mangas={mangas} title="All Manga" loading={loading} showFilters />
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Eye, Clock, Download, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, Eye, Download, ChevronDown, ChevronUp } from "lucide-react";
 import "../../styles/ChapterList.css";
 
 const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapterSelect }) => {
@@ -58,12 +58,6 @@ const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapt
     }
   };
 
-  const getReadingTime = (chapterNumber) => {
-    const baseTime = 5;
-    const additionalTime = Math.floor(Number(chapterNumber || 0) / 10);
-    return `${baseTime + additionalTime} min read`;
-  };
-
   return (
     <div className="chapter-list">
       <div className="chapter-list-header">
@@ -74,6 +68,7 @@ const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapt
             className="sort-btn"
             onClick={toggleSortOrder}
             title={`Sort ${sortOrder === "desc" ? "Ascending" : "Descending"}`}
+            type="button"
           >
             {sortOrder === "desc" ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
             {sortOrder === "desc" ? "Newest First" : "Oldest First"}
@@ -124,18 +119,13 @@ const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapt
                       </div>
                     )}
 
-                    {/* show views even if 0 */}
+                    {/* ✅ show views even if 0 */}
                     {chapter.views !== undefined && chapter.views !== null && (
                       <div className="meta-item">
                         <Eye size={14} className="meta-icon" />
                         <span>{Number(chapter.views).toLocaleString()}</span>
                       </div>
                     )}
-
-                    <div className="meta-item">
-                      <Clock size={14} className="meta-icon" />
-                      <span>{getReadingTime(chapter.number)}</span>
-                    </div>
 
                     {chapter.uploader && (
                       <div className="meta-item uploader">
@@ -158,7 +148,11 @@ const ChapterList = ({ chapters: chaptersProp = [], mangaId, mangaTitle, onChapt
                   )}
 
                   {chapter.description && (
-                    <button className="action-btn expand-btn" onClick={() => toggleChapterExpand(chapter.id)}>
+                    <button
+                      className="action-btn expand-btn"
+                      onClick={() => toggleChapterExpand(chapter.id)}
+                      type="button"
+                    >
                       {expandedChapter === chapter.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                   )}

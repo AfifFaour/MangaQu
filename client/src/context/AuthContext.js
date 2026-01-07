@@ -1,14 +1,14 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import axios from 'axios';
+// src/context/AuthContext.js
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
+import api, { authAPI } from "../services/Api";
+import LoginService from "../services/LoginService";
 
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  return ctx;
 };
 
 export const AuthProvider = ({ children }) => {
@@ -17,261 +17,155 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
-  // Storage helper functions
-  const setAuthData = (token, userData) => {
-    localStorage.setItem('mangaqu_token', token);
-    localStorage.setItem('mangaqu_user', JSON.stringify(userData));
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  };
+  const clearError = useCallback(() => setError(null), []);
 
-  const clearAuthData = () => {
-    localStorage.removeItem('mangaqu_token');
-    localStorage.removeItem('mangaqu_user');
-    delete axios.defaults.headers.common['Authorization'];
-  };
+  const getToken = useCallback(() => LoginService.getToken(), []);
 
-  const getAuthData = () => {
-    const token = localStorage.getItem('mangaqu_token');
-    const userStr = localStorage.getItem('mangaqu_user');
-    return {
-      token,
-      user: userStr ? JSON.parse(userStr) : null
-    };
-  };
+  const isAuthenticated = useCallback(() => {
+    return !!LoginService.getToken() && !!user;
+  }, [user]);
 
-  // Initialize auth state from localStorage
+  const logout = useCallback(() => {
+    LoginService.logout(); // remove cookie token
+    setUser(null);
+    setError(null);
+
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  // Init: verify token if exists
   useEffect(() => {
-    const initializeAuth = async () => {
+    const init = async () => {
       try {
-        const { token, user: storedUser } = getAuthData();
-        
-        if (token && storedUser) {
-          // Set axios default header
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
-          // Verify token with server
-          try {
-            const response = await axios.post('http://localhost:5001/api/auth/verify', {}, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (response.data.valid) {
-              console.log('✅ Auth initialized:', response.data.user.username);
-              setUser(response.data.user);
-            } else {
-              console.log('❌ Invalid token during init');
-              clearAuthData();
-            }
-          } catch (profileError) {
-            console.log('❌ Token verification failed:', profileError.message);
-            clearAuthData();
-          }
-        } else {
-          console.log('ℹ️ No stored auth data');
+        const token = LoginService.getToken();
+
+        if (!token) {
+          setUser(null);
+          return;
         }
-      } catch (error) {
-        console.error('❌ Auth initialization error:', error);
-        clearAuthData();
+
+        // ✅ verify token with backend
+        const res = await authAPI.verify();
+        if (res.data?.valid) {
+          setUser(res.data.user || null);
+        } else {
+          LoginService.logout();
+          setUser(null);
+        }
+      } catch (e) {
+        // token invalid/expired
+        LoginService.logout();
+        setUser(null);
       } finally {
         setLoading(false);
         setInitialized(true);
       }
     };
 
-    initializeAuth();
+    init();
   }, []);
 
-  // Setup axios interceptors
+  // Axios response global handling (optional but useful)
   useEffect(() => {
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        const { token } = getAuthData();
-        if (token && !config.headers.Authorization) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log('🔐 Authentication error, logging out');
-          clearAuthData();
+    const interceptor = api.interceptors.response.use(
+      (r) => r,
+      (e) => {
+        const status = e?.response?.status;
+        if (status === 401 || status === 403) {
+          LoginService.logout();
           setUser(null);
-          
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+
+          if (window.location.pathname !== "/login") {
+            window.location.href = "/login";
           }
         }
-        
-        if (error.response?.data?.error) {
-          setError(error.response.data.error);
-        }
-        
-        return Promise.reject(error);
+        if (e?.response?.data?.error) setError(e.response.data.error);
+        return Promise.reject(e);
       }
     );
 
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
+    return () => api.interceptors.response.eject(interceptor);
   }, []);
 
-  // Clear error after some time
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
-  // Login function
+  // Login
   const login = useCallback(async (email, password) => {
     try {
       setError(null);
       setLoading(true);
-      
-      const response = await axios.post('http://localhost:5001/api/auth/login', {
-        email,
-        password
-      });
 
-      const { token, user: userData } = response.data;
-      
-      console.log('✅ Login successful:', userData.username, 'Role:', userData.role);
-      
-      setAuthData(token, userData);
-      setUser(userData);
-      setLoading(false);
-      
+      const res = await authAPI.login({ email, password });
+      const token = res.data?.token;
+      const userData = res.data?.user;
+
+      if (!token) {
+        setError("No token returned from server");
+        return { success: false };
+      }
+
+      // ✅ store token in cookie (NOT localStorage)
+      LoginService.setToken(token);
+      setUser(userData || null);
+
       return { success: true, user: userData };
-      
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
-      console.error('❌ Login error:', errorMessage);
-      setError(errorMessage);
+    } catch (e) {
+      const msg = e?.response?.data?.error || "Login failed. Please try again.";
+      setError(msg);
+      return { success: false, error: msg };
+    } finally {
       setLoading(false);
-      return { 
-        success: false, 
-        error: errorMessage
-      };
+      setInitialized(true);
     }
   }, []);
 
-  // Register function
+  // Register
   const register = useCallback(async (username, email, password) => {
     try {
       setError(null);
       setLoading(true);
-      
-      const response = await axios.post('http://localhost:5001/api/auth/register', {
-        username,
-        email,
-        password
-      });
 
-      const { token, user: userData } = response.data;
-      
-      console.log('✅ Registration successful:', userData.username);
-      
-      setAuthData(token, userData);
-      setUser(userData);
-      setLoading(false);
-      
+      const res = await authAPI.register({ username, email, password });
+      const token = res.data?.token;
+      const userData = res.data?.user;
+
+      if (!token) {
+        setError("No token returned from server");
+        return { success: false };
+      }
+
+      LoginService.setToken(token);
+      setUser(userData || null);
+
       return { success: true, user: userData };
-      
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
-      console.error('❌ Registration error:', errorMessage);
-      setError(errorMessage);
+    } catch (e) {
+      const msg = e?.response?.data?.error || "Registration failed. Please try again.";
+      setError(msg);
+      return { success: false, error: msg };
+    } finally {
       setLoading(false);
-      return { 
-        success: false, 
-        error: errorMessage
-      };
+      setInitialized(true);
     }
   }, []);
 
-  // Logout function
-  const logout = useCallback(() => {
-    console.log('👋 Logging out user:', user?.username);
-    clearAuthData();
-    setUser(null);
-    setError(null);
-    window.location.href = '/login';
-  }, [user]);
+  const isAdmin = useCallback(() => user?.role === "admin", [user]);
 
-  // Update user function
-  const updateUser = useCallback((updatedUser) => {
-    setUser(updatedUser);
-    localStorage.setItem('mangaqu_user', JSON.stringify(updatedUser));
-  }, []);
-
-  // Clear error function
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  // Check if user is admin
-  const isAdmin = useCallback(() => {
-    return user?.role === 'admin';
-  }, [user]);
-
-  // Check if user is authenticated
-  const isAuthenticated = useCallback(() => {
-    const { token, user: storedUser } = getAuthData();
-    return !!token && !!storedUser && !!user;
-  }, [user]);
-
-  // Get user ID
-  const getUserId = useCallback(() => {
-    return user?.id;
-  }, [user]);
-
-  // Get current token
-  const getToken = useCallback(() => {
-    return getAuthData().token;
-  }, []);
-
-  // Verify token with server
   const verifyToken = useCallback(async () => {
     try {
-      const { token } = getAuthData();
+      const token = LoginService.getToken();
       if (!token) return false;
-      
-      const response = await axios.post('http://localhost:5001/api/auth/verify', {}, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      return response.data.valid;
-    } catch (error) {
-      console.error('❌ Token verification failed:', error.message);
+      const res = await authAPI.verify();
+      return !!res.data?.valid;
+    } catch {
       return false;
     }
   }, []);
 
-  // Get user profile from server
-  const getProfile = useCallback(async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/auth/profile');
-      const updatedUser = response.data;
-      setUser(updatedUser);
-      localStorage.setItem('mangaqu_user', JSON.stringify(updatedUser));
-      return updatedUser;
-    } catch (error) {
-      console.error('Failed to get profile:', error);
-      if (error.response?.status === 401) {
-        logout();
-      }
-      return null;
-    }
-  }, [logout]);
+  const getUserId = useCallback(() => user?.id, [user]);
+
+  const updateUser = useCallback((updatedUser) => {
+    setUser(updatedUser);
+  }, []);
 
   const value = {
     user,
@@ -288,35 +182,28 @@ export const AuthProvider = ({ children }) => {
     getUserId,
     getToken,
     verifyToken,
-    getProfile
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Loading component
+// Loading wrapper (unchanged behavior)
 export const AuthLoading = ({ children, fallback = null }) => {
   const { loading, initialized } = useAuth();
-  
   if (loading || !initialized) {
-    return fallback || <div className="flex justify-center items-center h-screen">Loading authentication...</div>;
+    return fallback || <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
-  
   return children;
 };
 
-// Protected Route component
-export const ProtectedRoute = ({ 
-  children, 
-  requireAuth = true, 
+// Protected route (unchanged behavior)
+export const ProtectedRoute = ({
+  children,
+  requireAuth = true,
   adminOnly = false,
-  redirectTo = '/login'
+  redirectTo = "/login",
 }) => {
-  const { user, isAuthenticated, isAdmin, loading, initialized } = useAuth();
+  const { isAuthenticated, isAdmin, loading, initialized } = useAuth();
 
   if (loading || !initialized) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -328,7 +215,7 @@ export const ProtectedRoute = ({
   }
 
   if (requireAuth && adminOnly && !isAdmin()) {
-    window.location.href = '/unauthorized';
+    window.location.href = "/unauthorized";
     return null;
   }
 

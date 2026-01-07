@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/Components/nav/NavBar.js
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../Assets/MangaQuLogo.png";
@@ -22,6 +23,9 @@ export default function NavBar() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
 
+  // ✅ your server is on 5001
+  const API_BASE = "http://localhost:5001";
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   // desktop dropdowns
@@ -34,8 +38,17 @@ export default function NavBar() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  // ✅ autocomplete
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loadingSug, setLoadingSug] = useState(false);
+
   const navRef = useRef(null);
   const userMenuRef = useRef(null);
+  const sugBoxRef = useRef(null);
+
+  const debounceRef = useRef(null);
+  const abortRef = useRef(null);
 
   const types = ["Manga", "Manhwa", "Manhua", "One Shot", "Novel", "Doujinshi"];
   const genres = [
@@ -59,6 +72,7 @@ export default function NavBar() {
     setUserDropdown(false);
     setMobileTypesOpen(false);
     setMobileGenresOpen(false);
+    setShowSuggestions(false);
   };
 
   const handleLogout = () => {
@@ -66,35 +80,91 @@ export default function NavBar() {
     closeAll();
   };
 
-  const goSearch = () => {
-    const q = searchQuery.trim();
-    if (!q) return;
-    navigate(`/search?q=${encodeURIComponent(q)}`);
+  // ✅ build cover url from DB value like "Assets/CoverImg/..."
+  const coverUrl = (coverPath) => {
+    const p = String(coverPath || "").trim();
+    if (!p) return "";
+    // if already full URL, keep it
+    if (/^https?:\/\//i.test(p)) return p;
+    // ensure no double slash
+    return `${API_BASE}/${p.replace(/^\/+/, "")}`;
+  };
+
+  // ✅ click suggestion -> go to manga directly
+  // Ensure you have a route like: /manga/:id
+  const goToManga = (id) => {
+    if (!id) return;
+    navigate(`/manga/${id}`);
     setSearchQuery("");
+    setSuggestions([]);
+    setShowSuggestions(false);
     closeAll();
   };
 
-  // ✅ close everything on route change
+  // ✅ Search as you type (server.js supports: /api/manga?search=)
+  useEffect(() => {
+    const q = searchQuery.trim();
+
+    if (q.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
+      if (abortRef.current) abortRef.current.abort();
+      abortRef.current = new AbortController();
+
+      try {
+        setLoadingSug(true);
+        const res = await fetch(
+          `${API_BASE}/api/manga?search=${encodeURIComponent(q)}&sort=updated`,
+          { signal: abortRef.current.signal }
+        );
+        const data = await res.json();
+
+        const list = Array.isArray(data) ? data.slice(0, 8) : [];
+        setSuggestions(list);
+        setShowSuggestions(true);
+      } catch (e) {
+        // ignore abort; reset if anything else
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setLoadingSug(false);
+      }
+    }, 250);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery]);
+
+  // close everything on route change
   useEffect(() => {
     closeAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // ✅ click outside closes dropdowns
+  // click outside closes dropdowns + suggestions
   useEffect(() => {
     const onDocClick = (e) => {
       const insideNav = navRef.current?.contains(e.target);
       const insideUser = userMenuRef.current?.contains(e.target);
+      const insideSug = sugBoxRef.current?.contains(e.target);
 
       if (!insideNav) setActiveDropdown(null);
       if (!insideUser) setUserDropdown(false);
+      if (!insideSug) setShowSuggestions(false);
     };
 
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  // ✅ ESC closes drawer
+  // ESC closes all
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape") closeAll();
@@ -103,7 +173,9 @@ export default function NavBar() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const isSearchPage = location.pathname === "/search";
+  const onSearchEnter = () => {
+    if (suggestions.length) goToManga(suggestions[0].id);
+  };
 
   return (
     <nav className="navbar" ref={navRef}>
@@ -117,7 +189,7 @@ export default function NavBar() {
           {menuOpen ? <X size={20} /> : <ReorderIcon style={{ fontSize: 28 }} />}
         </button>
 
-        {/* DESKTOP LOGO (hidden on mobile via CSS) */}
+        {/* DESKTOP LOGO */}
         <Link to="/" className="navbar-left" onClick={closeAll}>
           <img src={logo} alt="MangaQu Logo" className="navbar-logo" />
         </Link>
@@ -134,7 +206,8 @@ export default function NavBar() {
 
           <div className="nav-dropdown">
             <button
-              className="nav-link"
+              type="button"
+              className="nav-link nav-link-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveDropdown((p) => (p === "types" ? null : "types"));
@@ -161,7 +234,8 @@ export default function NavBar() {
 
           <div className="nav-dropdown">
             <button
-              className="nav-link"
+              type="button"
+              className="nav-link nav-link-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveDropdown((p) => (p === "genres" ? null : "genres"));
@@ -191,35 +265,73 @@ export default function NavBar() {
               <Heart size={16} /> Favorite
             </Link>
           )}
-
-          {/* ✅ Search page link */}
-          <Link
-            to="/search"
-            className={`nav-link ${isSearchPage ? "active" : ""}`}
-            onClick={closeAll}
-          >
-            <Search size={16} /> Search
-          </Link>
         </div>
 
-        {/* DESKTOP SEARCH INPUT */}
-        <div className="search-container">
+        {/* ✅ DESKTOP SEARCH with covers */}
+        <div className="search-container" ref={sugBoxRef}>
           <Search size={18} className="search-icon" />
           <input
             className="search-input"
             placeholder="Search manga..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && goSearch()}
+            onFocus={() => suggestions.length && setShowSuggestions(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSearchEnter();
+              if (e.key === "Escape") setShowSuggestions(false);
+            }}
           />
+
           {searchQuery && (
             <button
+              type="button"
               className="clear-search"
-              onClick={() => setSearchQuery("")}
+              onClick={() => {
+                setSearchQuery("");
+                setSuggestions([]);
+                setShowSuggestions(false);
+              }}
               aria-label="Clear"
             >
               <X size={16} />
             </button>
+          )}
+
+          {showSuggestions && (
+            <div className="search-suggestions" role="listbox">
+              {loadingSug && <div className="sug-item muted">Loading…</div>}
+
+              {!loadingSug && suggestions.length === 0 && (
+                <div className="sug-item muted">No results</div>
+              )}
+
+              {!loadingSug &&
+                suggestions.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    className="sug-item"
+                    onClick={() => goToManga(m.id)}
+                  >
+                    <div className="sug-left">
+                      <img
+                        className="sug-cover"
+                        src={coverUrl(m.cover_image)}
+                        alt={m.title}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                      <div className="sug-text">
+                        <span className="sug-title">{m.title}</span>
+                        {m.type ? <span className="sug-sub">{m.type}</span> : null}
+                      </div>
+                    </div>
+
+                    {m.status ? <span className="sug-meta">{m.status}</span> : null}
+                  </button>
+                ))}
+            </div>
           )}
         </div>
 
@@ -227,6 +339,7 @@ export default function NavBar() {
         {isAuthenticated() ? (
           <div className="user-menu-container" ref={userMenuRef}>
             <button
+              type="button"
               className="user-menu-toggle"
               onClick={() => setUserDropdown((p) => !p)}
               aria-expanded={userDropdown}
@@ -260,7 +373,11 @@ export default function NavBar() {
 
                 <div className="dropdown-divider" />
 
-                <button className="dropdown-item logout" onClick={handleLogout}>
+                <button
+                  type="button"
+                  className="dropdown-item logout"
+                  onClick={handleLogout}
+                >
                   <LogOut size={16} /> Logout
                 </button>
               </div>
@@ -278,7 +395,7 @@ export default function NavBar() {
         )}
       </div>
 
-      {/* ✅ MOBILE LEFT DRAWER */}
+      {/* MOBILE LEFT DRAWER */}
       {menuOpen && (
         <div className="mobile-menu-overlay" onClick={closeAll}>
           <aside
@@ -288,6 +405,7 @@ export default function NavBar() {
             <div className="mobile-top">
               <span className="mobile-title">Menu</span>
               <button
+                type="button"
                 className="mobile-close"
                 onClick={closeAll}
                 aria-label="Close"
@@ -296,7 +414,7 @@ export default function NavBar() {
               </button>
             </div>
 
-            {/* MOBILE SEARCH */}
+            {/* MOBILE SEARCH (Enter -> first result) */}
             <div className="mobile-search">
               <Search size={18} className="mobile-search-icon" />
               <input
@@ -304,19 +422,28 @@ export default function NavBar() {
                 placeholder="Search manga..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && goSearch()}
+                onKeyDown={(e) => e.key === "Enter" && onSearchEnter()}
               />
               {searchQuery && (
                 <button
+                  type="button"
                   className="mobile-clear"
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                  }}
                   aria-label="Clear"
                 >
                   <X size={16} />
                 </button>
               )}
-              <button className="mobile-search-btn" onClick={goSearch}>
-                Search
+              <button
+                type="button"
+                className="mobile-search-btn"
+                onClick={onSearchEnter}
+              >
+                Go
               </button>
             </div>
 
@@ -343,21 +470,14 @@ export default function NavBar() {
                 <Clock size={18} /> Updated
               </Link>
 
-              {/* ✅ Search Page link in menu */}
-              <Link to="/search" className="mobile-link" onClick={closeAll}>
-                <Search size={18} /> Search
-              </Link>
-
               {/* Types submenu */}
               <button
+                type="button"
                 className="mobile-link mobile-subtoggle"
                 onClick={() => setMobileTypesOpen((p) => !p)}
               >
                 <span className="mobile-subtoggle-left">Types</span>
-                <ChevronDown
-                  size={18}
-                  className={mobileTypesOpen ? "rot" : ""}
-                />
+                <ChevronDown size={18} className={mobileTypesOpen ? "rot" : ""} />
               </button>
               {mobileTypesOpen && (
                 <div className="mobile-submenu">
@@ -375,14 +495,12 @@ export default function NavBar() {
 
               {/* Genres submenu */}
               <button
+                type="button"
                 className="mobile-link mobile-subtoggle"
                 onClick={() => setMobileGenresOpen((p) => !p)}
               >
                 <span className="mobile-subtoggle-left">Genres</span>
-                <ChevronDown
-                  size={18}
-                  className={mobileGenresOpen ? "rot" : ""}
-                />
+                <ChevronDown size={18} className={mobileGenresOpen ? "rot" : ""} />
               </button>
               {mobileGenresOpen && (
                 <div className="mobile-submenu">
@@ -404,25 +522,21 @@ export default function NavBar() {
                     <User size={18} /> Profile
                   </Link>
 
-                  <Link
-                    to="/favorite"
-                    className="mobile-link"
-                    onClick={closeAll}
-                  >
+                  <Link to="/favorite" className="mobile-link" onClick={closeAll}>
                     <Heart size={18} /> Favorites
                   </Link>
 
                   {isAdmin() && (
-                    <Link
-                      to="/dashboard"
-                      className="mobile-link"
-                      onClick={closeAll}
-                    >
+                    <Link to="/dashboard" className="mobile-link" onClick={closeAll}>
                       <LayoutDashboard size={18} /> Dashboard
                     </Link>
                   )}
 
-                  <button className="mobile-link logout" onClick={handleLogout}>
+                  <button
+                    type="button"
+                    className="mobile-link logout"
+                    onClick={handleLogout}
+                  >
                     <LogOut size={18} /> Logout
                   </button>
                 </>

@@ -22,14 +22,12 @@ import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
 import MangaManagement from './pages/MangaManagement';
 import History from './pages/History';
-import Bookmarks from './pages/Bookmarks';
 import PageNotFound from './pages/PageNotFound';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Help from './pages/Help';
-
 import Reader from './Components/manga/Reader';
 
 import './App.css';
@@ -55,7 +53,12 @@ function App() {
                 <Route path="/manga/:id" element={<MangaDetail />} />
                 <Route path="/read/:mangaId/:chapterId" element={<Reading />} />
                 <Route path="/reader" element={<Reader />} />
-                
+
+                                // chapters
+                <Route path="/read/:mangaId/:chapterId" element={<Reader />} />
+
+                // volumes (same Reader!)
+                <Route path="/read-volume/:mangaId/:volumeId" element={<Reader />} />
                 {/* Auth routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUp />} />
@@ -87,11 +90,6 @@ function App() {
                 <Route path="/history" element={
                   <ProtectedRoute>
                     <History />
-                  </ProtectedRoute>
-                } />
-                <Route path="/bookmarks" element={
-                  <ProtectedRoute>
-                    <Bookmarks />
                   </ProtectedRoute>
                 } />
                 

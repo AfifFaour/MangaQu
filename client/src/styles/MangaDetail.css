@@ -1,9 +1,16 @@
+/* =========================
+   PAGE
+========================= */
 .manga-detail {
   min-height: 100vh;
   background: #0f0f0f;
   padding: 2rem 0;
+  color: #ccc;
 }
 
+/* =========================
+   BACK
+========================= */
 .back-nav {
   max-width: 1400px;
   margin: 0 auto 2rem;
@@ -18,26 +25,18 @@
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: 0.2s;
   border: 1px solid #333;
 }
 
 .back-button:hover {
-  color: white;
+  color: #fff;
   border-color: #666;
 }
 
-.manga-not-found {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #ccc;
-}
-
-.manga-not-found h2 {
-  color: white;
-  margin-bottom: 1rem;
-}
-
+/* =========================
+   HEADER
+========================= */
 .manga-header {
   max-width: 1400px;
   margin: 0 auto 3rem;
@@ -45,14 +44,16 @@
   display: grid;
   grid-template-columns: 300px 1fr;
   gap: 2rem;
-  align-items: start;
 }
 
+/* =========================
+   COVER
+========================= */
 .manga-cover {
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .cover-image {
@@ -63,13 +64,13 @@
 
 .cover-overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
   padding: 1.5rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s;
 }
 
 .manga-cover:hover .cover-overlay {
@@ -77,16 +78,16 @@
 }
 
 .read-first-btn {
+  background: #ef4444;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #ef4444;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  transition: 0.2s;
 }
 
 .read-first-btn:hover {
@@ -94,32 +95,28 @@
   transform: translateY(-2px);
 }
 
+/* =========================
+   INFO
+========================= */
 .manga-info {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-.manga-title-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .manga-title {
-  color: white;
+  color: #fff;
   font-size: 2.5rem;
   font-weight: 700;
-  line-height: 1.2;
   margin: 0;
-  flex: 1;
 }
 
+/* =========================
+   ACTIONS
+========================= */
 .manga-actions {
   display: flex;
   gap: 0.75rem;
-  flex-shrink: 0;
 }
 
 .bookmark-btn,
@@ -127,119 +124,165 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.3s ease;
   border: 1px solid #444;
   background: rgba(255, 255, 255, 0.05);
   color: #ccc;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .bookmark-btn:hover,
 .share-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: #fff;
 }
 
 .bookmark-btn.bookmarked {
   background: #3b82f6;
   border-color: #3b82f6;
-  color: white;
+  color: #fff;
 }
 
+/* =========================
+   META GRID
+========================= */
 .manga-meta-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 
 .meta-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid #333;
+  gap: 0.35rem;
 }
 
-.meta-icon {
+.meta-item svg {
   color: #888;
-  margin-bottom: 0.5rem;
 }
 
-.meta-value {
-  color: white;
+.meta-item span:first-of-type {
+  color: #fff;
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+.meta-item span:last-of-type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+}
+
+/* =========================
+   RATING (AVG)
+========================= */
+.rating-item {
+  gap: 0.4rem;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star {
+  opacity: 0.35;
+}
+
+.star.filled {
+  opacity: 1;
+}
+
+.rating-text {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.rating-count {
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+
+/* =========================
+   USER RATING
+========================= */
+.my-rating {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.my-rating-label {
+  font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
 
-.meta-label {
-  color: #888;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.my-rating-value {
+  color: #fff;
+  font-weight: 700;
 }
 
+.my-stars {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.my-star-btn {
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  color: #aaa;
+  transition: 0.2s;
+}
+
+.my-star-btn:hover {
+  color: #fff;
+  border-color: #666;
+}
+
+.my-star-btn.filled {
+  color: #fff;
+  border-color: #666;
+}
+
+.my-stars.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* =========================
+   DETAILS
+========================= */
 .manga-details {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.25rem;
+  font-size: 0.9rem;
 }
 
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.detail-label {
-  color: #888;
-  font-weight: 500;
-  min-width: 100px;
-}
-
-.detail-value {
-  color: #ccc;
-}
-
-.detail-value.status,
-.detail-value.type {
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.manga-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.genre-tag {
-  background: rgba(255, 255, 255, 0.05);
-  color: #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  border: 1px solid #333;
-  transition: all 0.3s ease;
-}
-
-.genre-tag:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
+/* =========================
+   DESCRIPTION
+========================= */
 .manga-description {
-  color: #ccc;
   line-height: 1.6;
   font-size: 1rem;
-  margin: 0;
 }
 
+/* =========================
+   TABS
+========================= */
 .content-tabs {
   max-width: 1400px;
   margin: 0 auto;
@@ -249,75 +292,84 @@
 .tab-nav {
   display: flex;
   border-bottom: 1px solid #333;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.tab-btn {
+.tab-nav button {
   background: none;
   border: none;
   color: #888;
   padding: 1rem 2rem;
-  font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
   border-bottom: 2px solid transparent;
+  transition: 0.2s;
 }
 
-.tab-btn:hover {
-  color: white;
+.tab-nav button:hover {
+  color: #fff;
 }
 
-.tab-btn.active {
-  color: white;
+.tab-nav button.active {
+  color: #fff;
   border-bottom-color: #ef4444;
 }
 
 .tab-content {
-  min-height: 400px;
+  min-height: 300px;
 }
 
-.details-content h3 {
-  color: white;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.info-item {
+/* =========================
+   VOLUME SWITCH
+========================= */
+.volume-switch {
   display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
   border-radius: 8px;
   border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.info-label {
-  color: #888;
-  font-weight: 500;
+.volume-label {
+  font-weight: 600;
+  color: #bbb;
 }
 
-.info-value {
-  color: #ccc;
+.volume-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
 }
 
-.related-content {
-  margin-top: 1rem;
+.volume-select:focus {
+  border-color: #666;
+  outline: none;
 }
 
-/* Responsive Design */
+/* =========================
+   NOT FOUND
+========================= */
+.manga-not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.manga-not-found h2 {
+  color: #fff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 1024px) {
   .manga-header {
     grid-template-columns: 250px 1fr;
-    gap: 1.5rem;
   }
-  
+
   .manga-title {
     font-size: 2rem;
   }
@@ -326,57 +378,53 @@
 @media (max-width: 768px) {
   .manga-header {
     grid-template-columns: 1fr;
-    gap: 2rem;
   }
-  
+
   .manga-cover {
     max-width: 300px;
     margin: 0 auto;
   }
-  
-  .manga-title-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .manga-actions {
-    justify-content: center;
-  }
-  
+
   .manga-meta-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .tab-nav {
     flex-direction: column;
   }
-  
-  .tab-btn {
-    text-align: center;
+
+  .tab-nav button {
     border-bottom: 1px solid #333;
     border-left: 2px solid transparent;
   }
-  
-  .tab-btn.active {
-    border-bottom-color: #333;
+
+  .tab-nav button.active {
     border-left-color: #ef4444;
+    border-bottom-color: #333;
   }
 }
 
 @media (max-width: 480px) {
-  .manga-detail {
-    padding: 1rem 0;
-  }
-  
-  .manga-title {
-    font-size: 1.75rem;
-  }
-  
   .manga-meta-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .manga-actions {
     flex-direction: column;
   }
+
+  .manga-title {
+    font-size: 1.75rem;
+  }
+}
+/* Make meta bookmark clickable and match other cards */
+.bookmark-meta {
+  cursor: pointer;
+  border: none;
+  background: inherit;
+  text-align: left;
+}
+
+.bookmark-meta.bookmarked svg {
+  fill: currentColor;
 }

@@ -1,273 +1,548 @@
-/* =====================================================
-   GLOBAL DARK THEME (MangaFire-style BLACK)
-===================================================== */
+/* ==========================
+   Pages.css (Updated / Newest / Favorite / Types / Genres)
+   MATCHES Home Theme
+   - NO red border on header tabs (Newest Releases / Recently Updated)
+   - Pro toolbar (search + view + sort + filter)
+   - Pro filter panel (Genres / Status) even if MangaGrid has basic markup
+========================== */
 
 :root {
-  --bg-main: #0a0a0a;
-  --bg-dark: #0f0f0f;
-  --bg-card: #141414;
-  --bg-hover: #1c1c1c;
+  --bg: #0f0f0f;
+  --panel: #1a1a1a;
+  --panel-2: #2a2a2a;
+  --panel-3: #141414;
 
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.12);
+  --border: #333;
+  --border-2: #2a2a2a;
+  --border-hover: #444;
 
-  --text-main: #ffffff;
-  --text-muted: #b0b0b0;
+  --text: #fff;
+  --muted: #ccc;
+  --muted-2: #9ca3af;
 
-  --accent: #ff4747;
-  --accent-soft: rgba(255, 71, 71, 0.18);
+  --accent: #ef4444;
+  --accent-hover: #dc2626;
 
-  --radius: 14px;
-  --shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
+  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* =====================================================
-   PAGE WRAPPER
-===================================================== */
-
+/* ==========================
+   Page Wrapper
+========================== */
 .browse-page {
   min-height: 100vh;
-  padding: 24px;
-  background: radial-gradient(
-    circle at top,
-    #1a1a1a 0%,
-    #0a0a0a 55%
-  );
+  background: var(--bg);
+  padding: 2rem 1rem 3rem;
 }
 
-/* =====================================================
-   PAGE HERO / HEADER
-===================================================== */
-
-.browse-header {
+.browse-page .container {
   max-width: 1200px;
-  margin: 30px auto;
-  padding: 42px 30px;
-  text-align: center;
-  border-radius: var(--radius);
-  background: linear-gradient(
-    180deg,
-    #1a1a1a,
-    #0d0d0d
-  );
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ==========================
+   Header (NO RED GLOW/BORDER)
+========================== */
+.browse-header {
+  background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  padding: 2.2rem 1.5rem;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+/* If any previous red glow existed using pseudo element, kill it */
+.browse-header::before,
+.browse-header::after {
+  content: none !important;
 }
 
 .browse-header h1 {
-  font-size: clamp(26px, 2.8vw, 38px);
+  margin: 0 0 0.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff 0%, #cfcfcf 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .browse-header p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-/* =====================================================
-   SORT / TAB BUTTONS (Updated / Newest)
-===================================================== */
-
+/* ==========================
+   Header Tabs (Newest Releases / Recently Updated)
+   ✅ NO RED BORDER
+========================== */
 .sort-options {
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 1.2rem;
 }
 
 .sort-option {
-  background: var(--bg-card);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  padding: 10px 18px;
+  padding: 0.55rem 1rem;
   border-radius: 999px;
-  font-weight: 600;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .sort-option:hover {
-  background: var(--bg-hover);
-  color: var(--text-main);
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
 }
 
+/* ✅ active: neutral, no red border */
 .sort-option.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  box-shadow: none;
 }
 
-/* =====================================================
-   GRID CONTROLS (SEARCH / SORT / VIEW)
-===================================================== */
+/* prevent any red outline focus */
+.sort-option:focus,
+.sort-option:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
 
-.manga-grid-controls,
-.grid-controls {
+/* ==========================
+   Favorites stats row
+========================== */
+.favorites-stats {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius);
-  background: var(--bg-dark);
-  border: 1px solid var(--border);
-  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
-.manga-grid-controls input,
-.manga-grid-controls select {
-  background: #0d0d0d;
-  border: 1px solid var(--border);
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-size: 0.85rem;
+/* ==========================
+   Error box
+========================== */
+.error {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  color: #ffecec;
+  margin: 1rem 0;
 }
 
-.manga-grid-controls input::placeholder {
-  color: #777;
+/* ============================================================
+   ✅ MANGAGRID TOOLBAR (Search + view buttons + sort + filter)
+   Works with common class names AND also fallback selectors.
+============================================================ */
+
+/* Try to catch "toolbar" containers used by MangaGrid */
+.browse-page .page-toolbar,
+.browse-page .grid-toolbar,
+.browse-page .manga-toolbar,
+.browse-page .manga-grid-toolbar,
+.browse-page .toolbar,
+.browse-page .controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 1.2rem 0 1rem;
+  flex-wrap: wrap;
 }
 
-.manga-grid-controls button {
-  background: var(--bg-card);
+/* Title on the left (Newest Releases (15)) */
+.browse-page .page-toolbar-title,
+.browse-page .toolbar-title,
+.browse-page .grid-title,
+.browse-page .manga-grid-title {
+  color: var(--text);
+  font-weight: 800;
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+/* Right side controls group */
+.browse-page .page-toolbar-controls,
+.browse-page .toolbar-controls,
+.browse-page .grid-controls,
+.browse-page .manga-grid-controls,
+.browse-page .controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Search wrapper */
+.browse-page .page-search,
+.browse-page .search-wrap,
+.browse-page .toolbar-search,
+.browse-page .grid-search,
+.browse-page .manga-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #101010;
   border: 1px solid var(--border);
-  color: #fff;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  min-width: 260px;
+}
+
+/* Search input (catch many names) */
+.browse-page .page-search input,
+.browse-page .search-wrap input,
+.browse-page .toolbar-search input,
+.browse-page .grid-search input,
+.browse-page .manga-search input,
+.browse-page input.search,
+.browse-page input[type="search"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.browse-page .page-search input::placeholder,
+.browse-page .search-wrap input::placeholder,
+.browse-page input.search::placeholder,
+.browse-page input[type="search"]::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* View toggle group (grid/list icons) */
+.browse-page .view-toggle,
+.browse-page .layout-toggle,
+.browse-page .view-switch,
+.browse-page .toggle-view {
+  display: inline-flex;
+  gap: 6px;
+  background: #101010;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+}
+
+/* View toggle buttons */
+.browse-page .view-toggle button,
+.browse-page .layout-toggle button,
+.browse-page .view-switch button,
+.browse-page .toggle-view button {
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.browse-page .view-toggle button:hover,
+.browse-page .layout-toggle button:hover,
+.browse-page .view-switch button:hover,
+.browse-page .toggle-view button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.browse-page .view-toggle button.active,
+.browse-page .layout-toggle button.active,
+.browse-page .view-switch button.active,
+.browse-page .toggle-view button.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-hover);
+  color: #fff;
+}
+
+/* Sort dropdown */
+.browse-page .page-sort,
+.browse-page select.sort,
+.browse-page select.page-sort,
+.browse-page select.sort-select,
+.browse-page select.grid-sort,
+.browse-page select.manga-sort {
+  background: #101010;
+  color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.55rem 0.8rem;
+  outline: none;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.manga-grid-controls button:hover {
-  background: var(--bg-hover);
+.browse-page .page-sort:focus,
+.browse-page select.sort:focus,
+.browse-page select.sort-select:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
-/* =====================================================
-   FILTER CHIPS (GENRES / STATUS)
-===================================================== */
+/* Filter icon button */
+.browse-page .page-filter-btn,
+.browse-page .filter-btn,
+.browse-page .open-filters,
+.browse-page .filters-toggle {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #101010;
+  border: 1px solid var(--border);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-.filter-group {
+.browse-page .page-filter-btn:hover,
+.browse-page .filter-btn:hover,
+.browse-page .open-filters:hover,
+.browse-page .filters-toggle:hover {
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+/* ============================================================
+   ✅ FILTER PANEL (Genres / Status)
+   This is the part in your screenshot that looks "unstyled".
+   We style common containers + fallback for raw buttons inside.
+============================================================ */
+
+/* panel container (many possible classnames) */
+.browse-page .filter-panel,
+.browse-page .filters-panel,
+.browse-page .filters,
+.browse-page .manga-filters,
+.browse-page .filter-box,
+.browse-page .filters-box,
+.browse-page .manga-grid-filters {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+/* headings inside panel */
+.browse-page .filter-panel h3,
+.browse-page .filters-panel h3,
+.browse-page .filters h3,
+.browse-page .manga-filters h3,
+.browse-page .filter-panel h4,
+.browse-page .filters-panel h4,
+.browse-page .filters h4,
+.browse-page .manga-filters h4,
+.browse-page .filter-panel strong,
+.browse-page .filters-panel strong,
+.browse-page .filters strong {
+  color: var(--text);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+}
+
+/* rows/wraps that contain the chips */
+.browse-page .filter-row,
+.browse-page .filters-row,
+.browse-page .filter-group,
+.browse-page .filters-group,
+.browse-page .chip-row,
+.browse-page .chips,
+.browse-page .genre-row,
+.browse-page .status-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 14px 0;
+  align-items: center;
 }
 
-.filter-chip {
-  background: #111;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 7px 12px;
+/* ✅ IMPORTANT: if MangaGrid outputs raw <button> without class -> style them */
+.browse-page .filter-panel button,
+.browse-page .filters-panel button,
+.browse-page .filters button,
+.browse-page .manga-filters button {
+  padding: 0.5rem 0.85rem;
   border-radius: 999px;
-  font-size: 0.78rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.filter-chip:hover {
-  color: #fff;
-  border-color: var(--border-strong);
-}
-
-.filter-chip.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-
-/* =====================================================
-   MANGA GRID
-===================================================== */
-
-.manga-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 18px;
-}
-
-@media (max-width: 1200px) {
-  .manga-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .manga-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* =====================================================
-   MANGA CARD
-===================================================== */
-
-.manga-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  overflow: hidden;
   border: 1px solid var(--border);
-  transition: all 0.25s ease;
-  box-shadow: 0 6px 22px rgba(0,0,0,0.7);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.manga-card:hover {
-  transform: translateY(-4px);
-  background: var(--bg-hover);
-  border-color: var(--border-strong);
+.browse-page .filter-panel button:hover,
+.browse-page .filters-panel button:hover,
+.browse-page .filters button:hover,
+.browse-page .manga-filters button:hover {
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
-.manga-card img {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
+/* if MangaGrid uses .active class for selected filter */
+.browse-page .filter-panel button.active,
+.browse-page .filters-panel button.active,
+.browse-page .filters button.active,
+.browse-page .manga-filters button.active,
+.browse-page .filter-panel button[aria-pressed="true"],
+.browse-page .filters-panel button[aria-pressed="true"],
+.browse-page .filters button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-hover);
+  color: #fff;
 }
 
-.manga-card .info {
-  padding: 12px;
+/* keep focus clean (no red outline) */
+.browse-page .filter-panel button:focus,
+.browse-page .filters-panel button:focus,
+.browse-page .filters button:focus,
+.browse-page .manga-filters button:focus,
+.browse-page .filter-panel button:focus-visible,
+.browse-page .filters-panel button:focus-visible,
+.browse-page .filters button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
-.manga-card .title {
-  font-weight: 700;
+/* ============================================================
+   Empty / Auth required blocks
+============================================================ */
+.empty-favorites,
+.auth-required {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  margin-top: 1.5rem;
+}
+
+.empty-favorites h2,
+.auth-required h2 {
+  margin: 0.5rem 0;
+  color: var(--text);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.empty-favorites p,
+.auth-required p {
+  margin: 0 0 1rem;
+  color: var(--muted);
   font-size: 0.95rem;
-  line-height: 1.3;
-  margin-bottom: 4px;
+  line-height: 1.6;
 }
 
-.manga-card .meta {
-  color: var(--text-muted);
-  font-size: 0.75rem;
+/* Buttons same as home CTA */
+.auth-button,
+.browse-button {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: all 0.25s ease;
+  border: none;
+  cursor: pointer;
 }
 
-/* =====================================================
-   EMPTY / ERROR STATES
-===================================================== */
+.auth-button:hover,
+.browse-button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25);
+}
 
-.error {
-  text-align: center;
+/* Secondary */
+.browse-button.secondary,
+.auth-button.secondary {
+  background: transparent;
+  border: 2px solid var(--accent);
   color: var(--accent);
-  padding: 40px;
-  font-weight: 600;
 }
 
-/* =====================================================
-   LOADING PLACEHOLDER
-===================================================== */
-
-.loading {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 40px;
+.browse-button.secondary:hover,
+.auth-button.secondary:hover {
+  background: var(--accent);
+  color: white;
 }
 
-/* =====================================================
-   FAVORITE PAGE FIX
-===================================================== */
+/* ==========================
+   Responsive
+========================== */
+@media (max-width: 768px) {
+  .browse-header {
+    padding: 1.6rem 1.1rem;
+  }
 
-.favorite-empty {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 80px 20px;
+  .browse-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .browse-page .page-search,
+  .browse-page .search-wrap,
+  .browse-page .toolbar-search,
+  .browse-page .grid-search,
+  .browse-page .manga-search {
+    min-width: 200px;
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .browse-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .auth-button,
+  .browse-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .browse-page .page-search,
+  .browse-page .search-wrap,
+  .browse-page .toolbar-search,
+  .browse-page .grid-search,
+  .browse-page .manga-search {
+    min-width: 100%;
+  }
 }

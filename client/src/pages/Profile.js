@@ -3,12 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import './../styles/profile.css';
 import { 
-  User, Settings, LogOut, Key, BookOpen, Heart, 
-  History, CreditCard, Shield, HelpCircle 
+  User, LogOut, Key, Shield, HelpCircle 
 } from 'lucide-react';
 
 function Profile() {
-  const { user, logout, isAdmin, updateUser } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
@@ -102,9 +101,6 @@ function Profile() {
   const menuItems = [
     { id: 'profile', icon: <User size={20} />, label: 'Profile', show: true },
     { id: 'security', icon: <Key size={20} />, label: 'Security', show: true },
-    { id: 'reading', icon: <BookOpen size={20} />, label: 'Reading History', show: true },
-    { id: 'favorites', icon: <Heart size={20} />, label: 'Favorites', show: true },
-    { id: 'billing', icon: <CreditCard size={20} />, label: 'Billing', show: isAdmin() },
     { id: 'admin', icon: <Shield size={20} />, label: 'Admin Dashboard', show: isAdmin() },
     { id: 'help', icon: <HelpCircle size={20} />, label: 'Help & Support', show: true }
   ];
@@ -153,18 +149,12 @@ function Profile() {
           <h2>
             {activeTab === 'profile' && 'Profile Settings'}
             {activeTab === 'security' && 'Security Settings'}
-            {activeTab === 'reading' && 'Reading History'}
-            {activeTab === 'favorites' && 'My Favorites'}
-            {activeTab === 'billing' && 'Billing'}
             {activeTab === 'admin' && 'Admin Dashboard'}
             {activeTab === 'help' && 'Help & Support'}
           </h2>
           <p className="profile-subtitle">
             {activeTab === 'profile' && 'Manage your account information'}
             {activeTab === 'security' && 'Update your password and security settings'}
-            {activeTab === 'reading' && 'View your reading history'}
-            {activeTab === 'favorites' && 'Manage your favorite manga'}
-            {activeTab === 'billing' && 'View billing information and invoices'}
             {activeTab === 'admin' && 'Access admin controls and statistics'}
             {activeTab === 'help' && 'Get help and contact support'}
           </p>
@@ -287,12 +277,6 @@ function Profile() {
                   <h3>Manga</h3>
                   <p>Add, edit, and delete manga titles</p>
                 </Link>
-
-                <div className="admin-card">
-                  <div className="admin-card-icon">⚙️</div>
-                  <h3>Settings</h3>
-                  <p>Configure site settings and preferences</p>
-                </div>
               </div>
             </div>
           )}
