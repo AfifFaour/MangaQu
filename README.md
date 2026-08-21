@@ -1,55 +1,37 @@
-<<<<<<< HEAD
-MangaQu - Read Manga Online Free
+<h1 align="center">MangaQu 📖</h1>
 
-Are you looking for a platform to read manga online? Look no further than our website! With over 10,000 titles, we offer an extensive collection of manga comics for all readers. Our platform provides a user-friendly interface that is easy to navigate and explore, so you can quickly find your desired title.
-We have a vast range of genres and sub-genres, ensuring there is something for everyone. From romance to action, we have got it all covered. We are always updating our platform with new and exciting manga titles, and all our comics are high-quality. You'll never be disappointed with the quality of the images.
+<p align="center">
+  <strong>A comprehensive web and mobile manga reading application.</strong>
+</p>
 
-Safe to use
-We understand how annoying it is to deal with pop-up ads and unwanted distractions while reading, which is why we have zero pop-up ads. Our platform is completely safe to use, and your reading experience will not be disrupted by unwanted advertisements.
-Smart features
-We also offer a smart and convenient sync feature that allows you to access your content on both your PC and mobile devices. No matter where you are, you can pick up where you left off, making reading manga comics even more enjoyable.
-Completely free
-Our website is entirely free to use. You don't need to register or pay for anything to access our vast collection of manga comics. We also provide you with the flexibility to switch between dark and light themes for comfortable reading.
+## 📝 About the Project
 
-## Features
-- 📚 Browse manga catalog
-- 🔍 Search and filter manga
-- 📖 Online reading interface
-- 💾 Save reading progress
-- 🎨 Responsive design
-- ⚡ Fast loading times
+MangaQu is designed to provide a seamless reading experience across devices. The architecture is built on a robust relational database with custom entity-relationship modeling to handle vast libraries, user tracking, and progression. The front-end leverages modern React components for a responsive and intuitive interface.
 
-Technologies
+## ✨ Features
 
-Frontend 
-•	React.js 18 : Component-based UI library. 
-•	React Router DOM : Client-side routing. 
-•	Lucide React : Icon library. 
-•	Material-UI Icons : Additional icons. 
-•	CSS3 : Styling and responsive design. 
+- **Cross-Platform Interface:** Optimized for both web and mobile viewing.
+- **Robust Library Management:** Complex relational database schema designed for fast querying of manga titles, chapters, and user bookmarks.
+- **Modern UI/UX:** Built with Material UI and customized icons for a clean aesthetic.
 
-Backend
-• Node.js + Express.js
-• MySQL database
-• JWT (jsonwebtoken) for authentication
-• bcryptjs for password hashing
-• cors for secure client access
-• fs + path for scanning chapter image folders dynamically
+## 🛠️ Built With
 
-MangaQu---UI
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-<img width="1899" height="917" alt="Screenshot 2025-11-30 155845" src="https://github.com/user-attachments/assets/d4e5c280-8aae-4795-aba5-ede8eccff34f" />
-<img width="1900" height="913" alt="Screenshot 2025-11-30 155902" src="https://github.com/user-attachments/assets/bc78983f-8391-4550-b92a-79b3a620fff4" />
-<img width="1904" height="916" alt="Screenshot 2025-11-30 155925" src="https://github.com/user-attachments/assets/390eec2e-d8d9-49fb-ba32-3230b0731789" />
-<img width="1903" height="957" alt="Screenshot 2026-01-01 011904" src="https://github.com/user-attachments/assets/476ecd6a-0d33-4db9-a404-0a50809ecb18" />
-<img width="1904" height="895" alt="Screenshot 2025-11-30 155941" src="https://github.com/user-attachments/assets/3a348073-87d5-4fb0-93ca-ae749b373cb7" />
-<img width="1902" height="915" alt="Screenshot 2026-01-01 011931" src="https://github.com/user-attachments/assets/10e0e4fa-ecea-4e79-b48c-56548e33f10f" />
-<img width="1900" height="850" alt="Screenshot 2026-01-01 011948" src="https://github.com/user-attachments/assets/73daeae9-a974-4ae8-9338-05ce5de2a8b4" />
-<img width="1903" height="852" alt="Screenshot 2026-01-01 012002" src="https://github.com/user-attachments/assets/8c43b669-59f9-45ea-ba5d-673ccdc11804" />
+- **Frontend:** React, React Router DOM, Material UI, Lucide React
+- **Database:** Relational SQL Database
+- **Design:** Custom ERD and Schema implementations
 
+## 🚀 Getting Started
 
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
 
+### Installation
+1. Clone the repo:
+   ```sh
+   git clone [https://github.com/AfifFaour/MangaQu.git](https://github.com/AfifFaour/MangaQu.git)
 
-
-
-
+1-Install dependencies:
+  npm install
+2-Start the development server:
+  npm start
