@@ -40,7 +40,7 @@ jobs:
         run: npm run build
         env:
           CI: false
-          REACT_APP_API_ORIGIN: https://mangaqu.onrender.com
+          REACT_APP_API_ORIGIN: https://mangaqu-0ztr.onrender.com
 
       - name: Add SPA fallback
         run: cp build/index.html build/404.html
