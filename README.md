@@ -1,6 +1,14 @@
 # MangaQu 📚
 
-A full-stack manga reading platform built with **React**, **Node.js/Express**, **Sequelize**, and **MySQL**. MangaQu provides manga discovery, chapter reading, user accounts, reading history, favourites, and administration tools through a responsive web interface.
+> A full-stack manga reading platform built with **React**, **Node.js/Express**, **Sequelize**, and **MySQL**.
+
+## 🌐 Live Demo
+
+**[Open MangaQu Demo](https://afiffaour.github.io/MangaQu/)**
+
+The frontend is deployed with **GitHub Pages** and connects to the MangaQu backend API hosted on Render.
+
+> **Demo note:** Some features that require the backend, database, authentication, or external services may depend on the production API being available.
 
 ## ✨ Features
 
