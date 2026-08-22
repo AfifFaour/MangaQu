@@ -32,9 +32,13 @@ import Reader from './Components/manga/Reader';
 import './App.css';
 
 function App() {
-  // CRA sets PUBLIC_URL from the package.json homepage during production builds.
-  // This makes BrowserRouter work both locally (/) and on GitHub Pages (/MangaQu).
-  const basename = process.env.PUBLIC_URL || undefined;
+  // GitHub Pages needs /MangaQu; Netlify/Render/custom hosts need /. 
+  // Do not use package.json's homepage as a global basename because that
+  // breaks production routing on hosts other than GitHub Pages.
+  const isGitHubPages =
+    typeof window !== 'undefined' &&
+    window.location.hostname.endsWith('github.io');
+  const basename = isGitHubPages ? '/MangaQu' : undefined;
 
   return (
     <AuthProvider>
