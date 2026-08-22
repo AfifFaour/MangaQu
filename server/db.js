@@ -15,7 +15,6 @@ const pool = mysql.createPool({
 
   // important for remote DBs
   connectTimeout: 30000,
-  acquireTimeout: 30000,
 
   // Railway proxy often requires SSL
   ssl: { rejectUnauthorized: false },
