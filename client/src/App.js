@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, ProtectedRoute } from './context/AuthContext';
 import { MangaProvider } from './context/MangaContext';
 import NavBar from './Components/common/NavBar';
 import Footer from './Components/common/Footer';
 
-// Import all your page components
 import Home from './pages/Home';
 import Browse from './pages/Browse';
 import Newest from './pages/Newest';
@@ -33,15 +32,18 @@ import Reader from './Components/manga/Reader';
 import './App.css';
 
 function App() {
+  // CRA sets PUBLIC_URL from the package.json homepage during production builds.
+  // This makes BrowserRouter work both locally (/) and on GitHub Pages (/MangaQu).
+  const basename = process.env.PUBLIC_URL || undefined;
+
   return (
     <AuthProvider>
       <MangaProvider>
-        <Router>
+        <Router basename={basename}>
           <div className="App">
             <NavBar />
             <main>
               <Routes>
-                {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/browse" element={<Browse />} />
                 <Route path="/newest" element={<Newest />} />
@@ -53,24 +55,17 @@ function App() {
                 <Route path="/manga/:id" element={<MangaDetail />} />
                 <Route path="/read/:mangaId/:chapterId" element={<Reading />} />
                 <Route path="/reader" element={<Reader />} />
-
-                                // chapters
-                <Route path="/read/:mangaId/:chapterId" element={<Reader />} />
-
-                // volumes (same Reader!)
                 <Route path="/read-volume/:mangaId/:volumeId" element={<Reader />} />
-                {/* Auth routes */}
+
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUp />} />
-                
-                {/* Static pages */}
+
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/help" element={<Help />} />
-                
-                {/* Protected routes */}
+
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <DashBoard />
@@ -86,14 +81,12 @@ function App() {
                     <Favorite />
                   </ProtectedRoute>
                 } />
-
                 <Route path="/history" element={
                   <ProtectedRoute>
                     <History />
                   </ProtectedRoute>
                 } />
-                
-                {/* Admin routes */}
+
                 <Route path="/admin" element={
                   <ProtectedRoute adminOnly>
                     <DashBoard />
@@ -109,8 +102,7 @@ function App() {
                     <MangaManagement />
                   </ProtectedRoute>
                 } />
-                
-                {/* 404 page */}
+
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </main>
