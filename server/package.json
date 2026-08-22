@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
+    "start": "node -r ./mysql2-config-filter.js server.js",
     "dev": "nodemon server.js",
     "seed": "node src/config/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,7 +20,6 @@
     "cheerio": "^1.1.2",
     "cloudinary": "^2.8.0",
     "compression": "^1.8.1",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.2.3",
@@ -42,8 +41,8 @@
     "path": "^0.12.7",
     "redis": "^5.10.0",
     "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.3",
-    "slugify": "^1.6.6"
+    "sequelize-cli": "^6.6.6",
+    "slugify": "^1.6.1"
   },
   "devDependencies": {
     "jest": "^30.2.0",
