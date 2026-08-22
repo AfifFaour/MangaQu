@@ -3,10 +3,9 @@ import axios from "axios";
 import LoginService from "./LoginService";
 
 /**
- * In production set (Render frontend env):
- * REACT_APP_API_ORIGIN=https://mangaqu-0ztr.onrender.com
- *
- * In dev it falls back to localhost.
+ * Production can override the API with REACT_APP_API_ORIGIN.
+ * When it is not provided, use the deployed Render API in production
+ * and localhost during development.
  */
 const normalizeOrigin = (v) => {
   if (!v) return "";
@@ -14,8 +13,12 @@ const normalizeOrigin = (v) => {
   return unquoted.trim().replace(/\/+$/, "");
 };
 
+const configuredOrigin = normalizeOrigin(process.env.REACT_APP_API_ORIGIN);
+const productionOrigin = "https://mangaqu-0ztr.onrender.com";
+
 export const API_ORIGIN =
-  normalizeOrigin(process.env.REACT_APP_API_ORIGIN) || "http://localhost:5001";
+  configuredOrigin ||
+  (process.env.NODE_ENV === "production" ? productionOrigin : "http://localhost:5001");
 
 export const API_BASE = `${API_ORIGIN}/api`;
 
@@ -28,13 +31,12 @@ export const toAssetUrl = (p) => {
 
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: false, // ✅ using Bearer token, not cookies
+  withCredentials: false,
 });
 
-// ✅ ONE interceptor only (no localStorage here)
 api.interceptors.request.use(
   (config) => {
-    const token = LoginService?.getToken?.(); // safe call
+    const token = LoginService?.getToken?.();
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -51,7 +53,6 @@ export const mangaAPI = {
   getAll: (params = {}) => api.get("/manga", { params }),
   getOne: (id) => api.get(`/manga/${id}`),
   getRelated: (id) => api.get(`/manga/${id}/related`),
-
   getNewest: () => api.get("/manga", { params: { sort: "newest" } }),
   getUpdated: () => api.get("/manga", { params: { sort: "updated" } }),
   getPopular: () => api.get("/manga", { params: { sort: "popular" } }),
@@ -62,36 +63,16 @@ export const mangaAPI = {
 export const chapterAPI = {
   getByManga: (mangaId) => api.get(`/manga/${mangaId}/chapters`),
   getChapterPages: (chapterId) => api.get(`/chapters/${chapterId}/pages`),
-
-  /**
-   * ✅ NEW (replace /user/progress)
-   * Save chapter progress:
-   * payload: { manga_id, chapter_id, page_number }
-   */
   saveReadingProgress: (payload) => api.post("/reading-history/chapter", payload),
-
-  /**
-   * (Optional) Load last chapter progress for a manga
-   * GET /api/reading-history/chapter/:mangaId
-   */
   getReadingProgress: (mangaId) => api.get(`/reading-history/chapter/${mangaId}`),
 };
 
-/**
- * ✅ NEW: Reading History API (Chapters + Volumes)
- * Works only when logged in (Bearer token auto attached).
- */
 export const readingHistoryAPI = {
-  // --- chapters ---
   saveChapter: ({ manga_id, chapter_id, page_number }) =>
     api.post("/reading-history/chapter", { manga_id, chapter_id, page_number }),
-
   getChapter: (mangaId) => api.get(`/reading-history/chapter/${mangaId}`),
-
-  // --- volumes ---
   saveVolume: ({ manga_id, volume_id, page_number }) =>
     api.post("/reading-history/volume", { manga_id, volume_id, page_number }),
-
   getVolume: (mangaId) => api.get(`/reading-history/volume/${mangaId}`),
 };
 
@@ -100,9 +81,10 @@ export const userAPI = {
   addFavorite: (mangaId) => api.post(`/user/favorites/${mangaId}`),
   removeFavorite: (mangaId) => api.delete(`/user/favorites/${mangaId}`),
 };
+
 export const volumeAPI = {
   getByManga: (mangaId) => api.get(`/manga/${mangaId}/volumes`),
-  getVolumePages: (volumeId) => api.get(`/volumes/${volumeId}/pages`), // backend already returns absolute URLs
+  getVolumePages: (volumeId) => api.get(`/volumes/${volumeId}/pages`),
 };
 
 export default api;
