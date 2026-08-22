@@ -21,3 +21,119 @@ main {
   flex: 1;
   background-color: #1a1a1a;
 }
+
+/* =========================================================
+   GLOBAL VISUAL FIXES
+   ========================================================= */
+
+/* Keep authentication labels on one line everywhere. */
+.auth-buttons,
+.auth-buttons a {
+  white-space: nowrap;
+}
+
+.auth-buttons a {
+  flex-shrink: 0;
+  min-width: max-content;
+}
+
+/* Make all interactive links/buttons feel consistent. */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   MOBILE NAVIGATION / AUTH
+   ========================================================= */
+@media (max-width: 900px) {
+  .auth-buttons {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .auth-buttons a {
+    flex: 1 1 0;
+    width: 50%;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 7px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap !important;
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Login */
+  .auth-buttons a:first-child {
+    color: #fff;
+    background: #111;
+    border: 1px solid #2a2a2a;
+  }
+
+  .auth-buttons a:first-child:hover,
+  .auth-buttons a:first-child:active {
+    color: #fff;
+    background: #1a1a1a;
+    border-color: #3a3a3a;
+  }
+
+  /* Sign Up */
+  .auth-buttons a:last-child {
+    color: #fff;
+    background: #ef4444;
+    border: 1px solid #ef4444;
+  }
+
+  .auth-buttons a:last-child:hover,
+  .auth-buttons a:last-child:active {
+    color: #fff;
+    background: #dc2626;
+    border-color: #dc2626;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* If the existing navbar CSS places auth inside the mobile drawer,
+     give it proper spacing and keep it visually consistent. */
+  .mobile-menu-content .auth-buttons {
+    display: flex !important;
+    width: 100%;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #2a2a2a;
+  }
+
+  /* Mobile drawer links should never render as plain browser links. */
+  .mobile-links a,
+  .mobile-submenu a {
+    text-decoration: none;
+  }
+
+  .mobile-links a:focus-visible,
+  .mobile-submenu a:focus-visible,
+  .auth-buttons a:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+  }
+}
+
+/* Small phones: prevent the navbar from becoming cramped. */
+@media (max-width: 480px) {
+  .auth-buttons {
+    gap: 7px;
+  }
+
+  .auth-buttons a {
+    height: 42px;
+    padding: 0 9px;
+    font-size: 0.88rem;
+  }
+}
