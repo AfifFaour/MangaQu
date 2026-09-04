@@ -1,4 +1,3 @@
-// db.js
 require("dotenv").config();
 const mysql = require("mysql2/promise");
 
@@ -24,7 +23,6 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 0,
 });
 
-// quick test on startup
 (async () => {
   try {
     const conn = await pool.getConnection();
