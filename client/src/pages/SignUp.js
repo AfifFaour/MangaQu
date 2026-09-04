@@ -24,7 +24,6 @@ function SignUp() {
 
     const from = location.state?.from?.pathname || '/';
 
-    // Redirect if already logged in
     useEffect(() => {
         if (!authLoading && isAuthenticated()) {
             const searchParams = new URLSearchParams(location.search);
@@ -36,7 +35,6 @@ function SignUp() {
         }
     }, [authLoading, isAuthenticated, navigate, from, location.search]);
 
-    // Clear error when user starts typing
     useEffect(() => {
         if (error && (formData.username || formData.email || formData.password)) {
             clearError();
@@ -48,28 +46,24 @@ function SignUp() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 
-        // Username validation
         if (!formData.username.trim()) {
             newErrors.username = 'Username is required';
         } else if (!usernameRegex.test(formData.username)) {
             newErrors.username = '3-20 characters (letters, numbers, underscores)';
         }
 
-        // Email validation
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!emailRegex.test(formData.email)) {
             newErrors.email = 'Please enter a valid email';
         }
 
-        // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 6) {
             newErrors.password = 'Minimum 6 characters';
         }
 
-        // Confirm password validation
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = 'Please confirm your password';
         } else if (formData.password !== formData.confirmPassword) {
@@ -131,7 +125,6 @@ function SignUp() {
         }
     };
 
-    // Show loading screen while auth is initializing
     if (authLoading) {
         return (
             <div className="auth-loading">
@@ -264,7 +257,6 @@ function SignUp() {
                                 {showPassword.confirmPassword ? "Hide" : "Show"}
                             </button>
                         </div>
-                        
                         {errors.confirmPassword && (
                             <span className="error-message">{errors.confirmPassword}</span>
                         )}
