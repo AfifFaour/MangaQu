@@ -5,7 +5,7 @@ import axios from 'axios';
 function History() {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, today, week, month
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     fetchHistory();
@@ -13,7 +13,6 @@ function History() {
 
   const fetchHistory = async () => {
     setIsLoading(true);
-    // Simulate API call
     setTimeout(() => {
       const mockHistory = [
         { id: 1, mangaId: 1, mangaTitle: 'Naruto', chapter: 215, date: '2 hours ago', readTime: '15 min' },
@@ -29,7 +28,6 @@ function History() {
 
   const clearHistory = () => {
     if (window.confirm('Are you sure you want to clear your reading history?')) {
-      // Clear history logic
       setHistory([]);
     }
   };
@@ -42,25 +40,25 @@ function History() {
       </div>
 
       <div className="history-filters">
-        <button 
+        <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
           onClick={() => setFilter('all')}
         >
           All Time
         </button>
-        <button 
+        <button
           className={`filter-btn ${filter === 'today' ? 'active' : ''}`}
           onClick={() => setFilter('today')}
         >
           Today
         </button>
-        <button 
+        <button
           className={`filter-btn ${filter === 'week' ? 'active' : ''}`}
           onClick={() => setFilter('week')}
         >
           This Week
         </button>
-        <button 
+        <button
           className={`filter-btn ${filter === 'month' ? 'active' : ''}`}
           onClick={() => setFilter('month')}
         >
