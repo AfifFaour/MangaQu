@@ -1,4 +1,3 @@
-// client/src/pages/Newest.js
 import React, { useEffect, useMemo, useState } from "react";
 import MangaGrid from "../Components/manga/MangaGrid";
 import api from "../services/Api";
@@ -7,7 +6,7 @@ import "../styles/Pages.css";
 const Newest = () => {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState("newest"); // newest | recently-added
+  const [sortBy, setSortBy] = useState("newest");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -32,10 +31,8 @@ const Newest = () => {
     const copy = [...mangas];
 
     if (sortBy === "recently-added") {
-      // updated_at DESC
       copy.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
     } else {
-      // created_at DESC
       copy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     }
 
