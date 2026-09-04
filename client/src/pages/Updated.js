@@ -1,7 +1,6 @@
-// src/pages/Updated.js
 import React, { useEffect, useMemo, useState } from "react";
 import MangaGrid from "../Components/manga/MangaGrid";
-import api from "../services/Api"; // axios instance with baseURL = http://localhost:5001/api
+import api from "../services/Api";
 import "../styles/Pages.css";
 
 const Updated = () => {
@@ -10,7 +9,6 @@ const Updated = () => {
   const [sortBy, setSortBy] = useState("recently-updated");
   const [error, setError] = useState("");
 
-  // Map UI sort -> server sort param
   const serverSort = useMemo(() => {
     if (sortBy === "popular") return "popular";
     if (sortBy === "highest-rated") return "rating";
@@ -25,7 +23,6 @@ const Updated = () => {
         setLoading(true);
         setError("");
 
-        // ✅ uses your server: GET /api/manga?sort=updated|popular|rating
         const res = await api.get(`/manga`, {
           params: { sort: serverSort },
         });
