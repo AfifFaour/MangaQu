@@ -1,4 +1,3 @@
-// src/hooks/UseAuth.js
 import { useState, useEffect } from 'react';
 import { authAPI } from '../services/Api';
 
@@ -7,7 +6,6 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check if user is logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
