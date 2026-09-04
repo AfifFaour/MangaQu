@@ -31,12 +31,10 @@ const Types = () => {
 
         let res;
 
-        // ALL
         if (selectedType === "all") {
-          res = await api.get("/manga"); // GET /api/manga
+          res = await api.get("/manga");
           let data = Array.isArray(res.data) ? res.data : [];
 
-          // client-side sort for "all"
           if (sortBy === "popular") data.sort((a, b) => (b.views || 0) - (a.views || 0));
           else if (sortBy === "rating") data.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           else data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -45,7 +43,6 @@ const Types = () => {
           return;
         }
 
-        // FILTERED BY TYPE
         res = await mangaAPI.getMangaByType(selectedType, sortBy);
         setMangas(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
