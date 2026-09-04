@@ -1,19 +1,17 @@
-// client/src/Components/manga/Rating.js
 import React, { useEffect, useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import api from "../../services/Api";
-import LoginService from "../../services/LoginService"; // keep same usage as your MangaDetail
+import LoginService from "../../services/LoginService";
 
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
 const Rating = ({
   mangaId,
-  // optional UI props
   size = 18,
   showCount = true,
   showLabel = true,
   className = "",
-  onSaved, // optional callback({rating_avg, rating_count, your_rating})
+  onSaved,
 }) => {
   const safeMangaId = useMemo(() => String(mangaId || ""), [mangaId]);
 
@@ -58,11 +56,8 @@ const Rating = ({
       try {
         setLoading(true);
         setErr(null);
-
-        // always load public stats
         await fetchStats();
 
-        // load my rating if logged in
         if (LoginService?.isLoggedIn?.() && LoginService?.getToken?.()) {
           try {
             await fetchMine();
@@ -127,7 +122,6 @@ const Rating = ({
     }
   };
 
-  // UI helpers
   const avgFilled = useMemo(() => {
     const n = Number(avg);
     if (!Number.isFinite(n) || n <= 0) return 0;
@@ -146,7 +140,6 @@ const Rating = ({
     <div className={`mq-rating ${className}`} style={{ opacity: loading ? 0.85 : 1 }}>
       {showLabel && <div className="mq-rating-title">Rating</div>}
 
-      {/* Average stars */}
       <div className="mq-rating-avg">
         <span className="mq-stars" aria-label={`Average rating ${avgText} out of 5`}>
           {Array.from({ length: 5 }).map((_, i) => (
@@ -169,7 +162,6 @@ const Rating = ({
         </span>
       </div>
 
-      {/* My rating */}
       <div className={`mq-my-rating ${saving ? "disabled" : ""}`}>
         <div className="mq-my-label">
           Your rating:{" "}
