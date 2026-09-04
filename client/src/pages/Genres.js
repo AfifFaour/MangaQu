@@ -11,11 +11,8 @@ const Genres = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [error, setError] = useState(null);
-
-  // chapterCount map: { [mangaId]: number }
   const [chapterCounts, setChapterCounts] = useState({});
 
-  // Keep your UI list (you can add/remove anytime)
   const genres = useMemo(
     () => [
       { value: "all", label: "All Genres" },
@@ -38,14 +35,11 @@ const Genres = () => {
   const getGenreLabel = (value) =>
     genres.find((g) => g.value === value)?.label || "All Genres";
 
-  // Normalize manga genres from whatever format you store
   const normalizeGenres = (manga) => {
-    // 1) If backend returns array: ["action","drama"]
     if (Array.isArray(manga.genres)) {
       return manga.genres.map((g) => String(g).toLowerCase().trim());
     }
 
-    // 2) If backend returns comma string: "Action, Drama"
     if (typeof manga.genres === "string") {
       return manga.genres
         .split(",")
@@ -53,7 +47,6 @@ const Genres = () => {
         .filter(Boolean);
     }
 
-    // 3) If you have a column called genre
     if (typeof manga.genre === "string") {
       return manga.genre
         .split(",")
@@ -61,7 +54,6 @@ const Genres = () => {
         .filter(Boolean);
     }
 
-    // 4) If you have genres_text
     if (typeof manga.genres_text === "string") {
       return manga.genres_text
         .split(",")
@@ -72,14 +64,12 @@ const Genres = () => {
     return [];
   };
 
-  // Fetch all manga once
   useEffect(() => {
     const fetchAll = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Your Browse.js uses /manga, so keep it consistent
         const res = await api.get("/manga");
         const list = Array.isArray(res.data) ? res.data : [];
         setAllMangas(list);
@@ -94,16 +84,13 @@ const Genres = () => {
     fetchAll();
   }, []);
 
-  // Apply genre filter + sorting
   useEffect(() => {
     let list = [...allMangas];
 
-    // Filter by genre (client-side)
     if (selectedGenre !== "all") {
       list = list.filter((m) => normalizeGenres(m).includes(selectedGenre));
     }
 
-    // Sort (client-side)
     if (sortBy === "newest") {
       list.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
     } else if (sortBy === "popular") {
@@ -115,15 +102,12 @@ const Genres = () => {
     setMangas(list);
   }, [allMangas, selectedGenre, sortBy]);
 
-  // Only when "Most Chapters" selected, fetch counts
   useEffect(() => {
     const fetchCounts = async () => {
       if (sortBy !== "chapters") return;
 
       try {
         setLoading(true);
-
-        // We count chapters for currently filtered mangas only
         const ids = mangas.map((m) => m.id);
 
         const results = await Promise.all(
@@ -141,11 +125,8 @@ const Genres = () => {
         results.forEach(([id, count]) => (map[id] = count));
         setChapterCounts(map);
 
-        // Sort mangas by chapters count descending
         setMangas((prev) =>
-          [...prev].sort(
-            (a, b) => (map[b.id] || 0) - (map[a.id] || 0)
-          )
+          [...prev].sort((a, b) => (map[b.id] || 0) - (map[a.id] || 0))
         );
       } catch (e) {
         console.error(e);
@@ -224,8 +205,6 @@ const Genres = () => {
         loading={loading}
         showFilters={false}
         emptyMessage={`No ${getGenreLabel(selectedGenre).toLowerCase()} manga found.`}
-        // Optional: if MangaGrid supports it later, you can pass counts:
-        // chapterCounts={chapterCounts}
       />
     </div>
   );
