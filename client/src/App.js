@@ -32,9 +32,6 @@ import Reader from './Components/manga/Reader';
 import './App.css';
 
 function App() {
-  // GitHub Pages needs /MangaQu; Netlify/Render/custom hosts need /. 
-  // Do not use package.json's homepage as a global basename because that
-  // breaks production routing on hosts other than GitHub Pages.
   const isGitHubPages =
     typeof window !== 'undefined' &&
     window.location.hostname.endsWith('github.io');
