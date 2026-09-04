@@ -1,4 +1,3 @@
-// src/pages/Browse.js
 import React, { useEffect, useState } from "react";
 import MangaGrid from "../Components/manga/MangaGrid";
 import api from "../services/Api";
