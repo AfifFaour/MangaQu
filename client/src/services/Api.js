@@ -1,12 +1,6 @@
-// src/services/Api.js
 import axios from "axios";
 import LoginService from "./LoginService";
 
-/**
- * Production can override the API with REACT_APP_API_ORIGIN.
- * When it is not provided, use the deployed Render API in production
- * and localhost during development.
- */
 const normalizeOrigin = (v) => {
   if (!v) return "";
   const unquoted = v.replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
