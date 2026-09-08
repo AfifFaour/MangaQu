@@ -22,29 +22,12 @@ main {
   background-color: #1a1a1a;
 }
 
-/* Global interaction consistency */
 button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Mobile navigation */
 @media (max-width: 900px) {
-  /* Desktop auth controls belong to the desktop navbar only.
-     The mobile drawer has its own .mobile-auth controls. */
-  .auth-buttons {
-    display: none !important;
-  }
-
-  /* Keep desktop navbar elements out of the mobile layout even if
-     another stylesheet changes their display value. */
-  .navbar-left,
-  .navbar-links,
-  .search-container,
-  .user-menu-container {
-    display: none !important;
-  }
-
   .mobile-links a,
   .mobile-submenu a {
     text-decoration: none;
