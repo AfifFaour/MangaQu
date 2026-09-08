@@ -185,16 +185,6 @@ Before deployment, verify that:
 4. Database accounts use appropriate permissions.
 5. CORS and other security settings are configured for the production environment.
 
-## 🖼️ Screenshots
-
-Recommended screenshots for the portfolio README:
-
-- Home / discovery page
-- Manga details page
-- Chapter reader
-- Login / registration
-- User library
-- Admin dashboard
 
 ## 🎓 Project Context
 
